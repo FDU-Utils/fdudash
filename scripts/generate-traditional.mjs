@@ -1,0 +1,2 @@
+import {Converter} from 'opencc-js';import {writeFile} from 'node:fs/promises';
+const convert=Converter({from:'cn',to:'t'}),map={};for(let i=0x3400;i<=0x9fff;i++){const char=String.fromCodePoint(i),result=convert(char);if(result!==char)map[char]=result;}map['才']='纔';map['只']='祇';await writeFile('public/traditional.js',`// Character forms only, generated with OpenCC (MIT); no regional vocabulary substitution.\nexport const traditionalMap=${JSON.stringify(map)};\n`);console.log({characterMappings:Object.keys(map).length});

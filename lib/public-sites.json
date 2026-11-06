@@ -1,0 +1,568 @@
+{
+  "sources": [
+    "https://www.fudan.edu.cn/407/list.htm",
+    "https://ecampus.fudan.edu.cn/fdeHallxcx/list.htm"
+  ],
+  "sites": [
+    {
+      "name": "复旦新闻",
+      "url": "http://news.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "未来学生",
+      "url": "https://www.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦校友",
+      "url": "https://alumni.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "中国语言文学系",
+      "url": "http://chinese.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "外国语言文学学院",
+      "url": "http://dfll.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "历史学系",
+      "url": "http://history.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "旅游学系",
+      "url": "http://tourism.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "文物与博物馆学系",
+      "url": "http://www.chm.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "哲学学院",
+      "url": "http://philosophy.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "法学院",
+      "url": "http://www.law.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "国际关系与公共事务学院",
+      "url": "http://www.sirpa.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "社会发展与公共政策学院",
+      "url": "http://www.ssdpp.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "新闻学院",
+      "url": "https://xwxy.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "经济学院",
+      "url": "https://econ.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "国际金融学院",
+      "url": "https://fisf.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "管理学院",
+      "url": "http://www.fdsm.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "马克思主义学院",
+      "url": "https://som.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "国际文化交流学院",
+      "url": "http://www.ices.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "数学科学学院",
+      "url": "http://math.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "物理学系",
+      "url": "http://phys.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "现代物理研究所/核科学与技术系",
+      "url": "http://imp.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "化学系",
+      "url": "http://www.chemistry.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "高分子科学系",
+      "url": "http://polymer.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "环境科学与工程系",
+      "url": "http://environment.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "大气与海洋科学系",
+      "url": "https://aos.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "微电子学院",
+      "url": "https://sme.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "航空航天系",
+      "url": "https://aero-mech.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "生命科学学院",
+      "url": "http://life.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "大数据学院",
+      "url": "http://www.sds.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "集成电路与微纳电子创新学院",
+      "url": "https://icmne.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "计算与智能创新学院",
+      "url": "https://ai.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "生物医学工程与技术创新学院",
+      "url": "https://bme-college.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "智能机器人与先进制造创新学院",
+      "url": "https://ciram.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "智能材料与未来能源创新学院",
+      "url": "https://icome.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "未来信息创新学院",
+      "url": "https://fit.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "基础医学院",
+      "url": "http://basicmed.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "公共卫生学院",
+      "url": "http://sph.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "药学院",
+      "url": "http://spfdu.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "护理学院",
+      "url": "http://nursing.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "法医学与法庭科学学院",
+      "url": "https://sfms.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "体育教学部",
+      "url": "http://www.fdty.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "终身教育集团(终身教育学院)",
+      "url": "http://www.cce.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "上海医学院",
+      "url": "http://shmc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "留学复旦",
+      "url": "https://iso.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "电子邮箱",
+      "url": "http://mail.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "办事大厅",
+      "url": "https://ehall.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "电子办公",
+      "url": "http://oa.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "图书馆",
+      "url": "http://www.library.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "信息公开",
+      "url": "http://www.xxgk.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "校长信箱",
+      "url": "http://xxgk.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "捐赠",
+      "url": "https://fuedf.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "教务处",
+      "url": "http://www.fdcollege.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "研究生院",
+      "url": "http://www.gs.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "科学技术研究院",
+      "url": "https://ist.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "文科科研处",
+      "url": "http://wkkyc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "人事处",
+      "url": "http://www.hr.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "外事处",
+      "url": "http://www.fao.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "总务处",
+      "url": "https://zongwuchu.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "财务处",
+      "url": "http://cwc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "信息办",
+      "url": "http://www.ecampus.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "校工会",
+      "url": "http://www.gonghui.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "E-learning",
+      "url": "http://elearning.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "精品课程",
+      "url": "http://jpkc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "选课系统",
+      "url": "http://xk.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "本科生学术研究资助",
+      "url": "http://www.jwc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "选课系统",
+      "url": "http://yjsxk.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "奖学金",
+      "url": "http://www.stuaff.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "学生职业发展协会",
+      "url": "http://www.career.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "校园一卡通",
+      "url": "http://ecard.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "正版软件下载",
+      "url": "http://mvls.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "校医院",
+      "url": "http://hospital.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "心理咨询",
+      "url": "http://www.caps.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "户政相关信息",
+      "url": "http://baoweichu.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "日常零修",
+      "url": "http://www.hqgs.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "校园地图",
+      "url": "http://map.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦校历",
+      "url": "https://jwc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "本科生招生",
+      "url": "https://ao.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "研究生招生",
+      "url": "http://www.gsao.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "新闻学院",
+      "url": "http://www.xwxy.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "经济学院",
+      "url": "http://www.econ.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "基础医学院",
+      "url": "http://medicine.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "体育教学部",
+      "url": "https://fdty.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "终身教育集团(终身教育学院)",
+      "url": "https://cce.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "纪检监察工作部门",
+      "url": "https://jwjc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "党委组织部",
+      "url": "http://zzb.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "共青团复旦大学委员会",
+      "url": "https://youth.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "研究生院",
+      "url": "https://gs.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "国际合作与交流处",
+      "url": "https://ogp.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "审计处",
+      "url": "http://sjc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "资产管理处(实验室安全...",
+      "url": "https://zcglc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "采购与招标管理中心",
+      "url": "https://czzx.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "基建处",
+      "url": "http://www.jijian.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "枫林校区管委会",
+      "url": "http://fenglin.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "张江校区管委会",
+      "url": "https://zjb.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "江湾校区管委会",
+      "url": "http://www.jwb.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "信息化办公室",
+      "url": "https://ecampus.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "档案馆",
+      "url": "http://www.fda.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "资产经营有限公司",
+      "url": "http://zcgs.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学第二附属学校",
+      "url": "https://2fx.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学附属徐汇实验学...",
+      "url": "https://xhsyxx.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学附属徐汇实验幼...",
+      "url": "https://yxyyey.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "港澳台事务办公室",
+      "url": "https://hmt.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "终身教育处",
+      "url": "https://zsjy.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "实验动物中心",
+      "url": "http://labanimal.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学基础医学实验教学中心",
+      "url": "http://syzx.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学计算机实验教学中心",
+      "url": "http://jszx.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学新闻传播学实验教学中心",
+      "url": "https://xwsys.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学生物科学实验教学中心",
+      "url": "http://bioc.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学化学教学实验示范中心",
+      "url": "http://www.ecce.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学物理教学实验中心",
+      "url": "http://phylab.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学附属复兴中学",
+      "url": "https://fuxing.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    },
+    {
+      "name": "复旦大学附属闵行实验学校",
+      "url": "https://fdmhsy.fudan.edu.cn/",
+      "source": "https://www.fudan.edu.cn/407/list.htm"
+    }
+  ]
+}
