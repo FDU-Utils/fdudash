@@ -95,3 +95,7 @@ npm start
 - 实验室及专用空间提供“需要预约”提示与预约平台入口，已核验的独立规则附来源。该提示不代表已同步所有预约目录或预约占用；实际使用条件以预约平台及空间管理方为准。
 - 首页采用逐卡片返回，优先显示待办，公开天气与公告独立读取，慢卡片不阻塞其他卡片显示。余额缓存一分钟、电量及课程作业缓存两分钟、校车按时刻表类型缓存；手动刷新绕过相应缓存。可用时复用 UIS 票据，避免重复解密密码。
 - 校车支持仅显示当前时间之后班次。已发一至两班全部显示，三班以上默认保留首尾，中间点击展开；已发班次有灰色样式和文字标记。
+
+### Chaoxing / Xuexitong
+
+The Chaoxing sidebar page lists enrolled courses in platform order, with teacher details and links to the original courses. Sign in independently using the official QR flow. Sessions are encrypted with the local Windows user key outside the repository and isolated by the local browser session. Refresh reuses a short-lived in-memory course cache; signing out forgets the saved Chaoxing session. This feature reads course lists only.

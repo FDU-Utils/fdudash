@@ -1,3 +1,4 @@
+import {chaoxingAction,forgetChaoxing} from './lib/chaoxing.mjs';
 import {vpnClassroomRead} from './lib/webvpn.mjs';
 import {loadClassrooms,buildings} from './lib/classrooms.mjs';
 import {courseCore,courseNavigation,courseModuleData} from './lib/elearning.mjs';
@@ -13,11 +14,11 @@ import {restoreProfile,dashboardData,readCampus,elearningBundle,withService,sess
 const port=Number(process.env.PORT||5173),origin=`http://127.0.0.1:${port}`;
 const sessions=new Map();const ttl=30*60*1000;
 setInterval(()=>{for(const [key,s] of sessions)if(Date.now()-s.time>ttl)sessions.delete(key);},60000).unref();
-const paths={'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/style.css':['style.css','text/css'],'/schedule.js':['schedule.js','text/javascript'],'/course-order.js':['course-order.js','text/javascript'],'/course-cards.js':['course-cards.js','text/javascript'],'/i18n.js':['i18n.js','text/javascript'],'/time.js':['time.js','text/javascript'],'/dashboard-view.js':['dashboard-view.js','text/javascript'],'/weather-view.js':['weather-view.js','text/javascript'],'/links-view.js':['links-view.js','text/javascript'],'/latin.js':['latin.js','text/javascript'],'/traditional.js':['traditional.js','text/javascript'],'/classrooms.js':['classrooms.js','text/javascript'],'/assets/fudan-emblem.png':['assets/fudan-emblem.png','image/png']};
+const paths={'/chaoxing-view.js':['chaoxing-view.js','text/javascript'],'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/style.css':['style.css','text/css'],'/schedule.js':['schedule.js','text/javascript'],'/course-order.js':['course-order.js','text/javascript'],'/course-cards.js':['course-cards.js','text/javascript'],'/i18n.js':['i18n.js','text/javascript'],'/time.js':['time.js','text/javascript'],'/dashboard-view.js':['dashboard-view.js','text/javascript'],'/weather-view.js':['weather-view.js','text/javascript'],'/links-view.js':['links-view.js','text/javascript'],'/latin.js':['latin.js','text/javascript'],'/traditional.js':['traditional.js','text/javascript'],'/classrooms.js':['classrooms.js','text/javascript'],'/assets/fudan-emblem.png':['assets/fudan-emblem.png','image/png']};
 function respond(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>8192)throw new CampusError('INPUT','请求过大。');}try{return JSON.parse(text);}catch{throw new CampusError('INPUT','请求格式错误。');}}
 http.createServer(async(req,res)=>{
- res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+ res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
  if(req.headers.host!==`127.0.0.1:${port}`){respond(res,403,{message:'请使用本机 127.0.0.1 地址。'});return;}
  const url=new URL(req.url,origin);
  try{
@@ -39,7 +40,7 @@ http.createServer(async(req,res)=>{
  if(res.destroyed)return;
  if(sessions.get(session.id)!==session){respond(res,401,{message:'本机会话已过期，请刷新页面。'});return;}
  session.time=Date.now();
- if(url.pathname==='/api/logout'&&req.method==='POST'){await profileCache.forget(session.id);await vault.forget(session.id);session.profile=null;session.accountKey=null;session.client=null;session.courseIds=null;session.dashboardCache=null;session.todoCache=null;session.learningCourses=null;session.examCache=null;session.homeWidgets=null;session.serviceAuthErrors=null;session.serviceAuth=null;respond(res,200,{ok:true});return;}
+ if(url.pathname==='/api/logout'&&req.method==='POST'){await forgetChaoxing(session);await profileCache.forget(session.id);await vault.forget(session.id);session.profile=null;session.accountKey=null;session.client=null;session.courseIds=null;session.dashboardCache=null;session.todoCache=null;session.learningCourses=null;session.examCache=null;session.homeWidgets=null;session.serviceAuthErrors=null;session.serviceAuth=null;respond(res,200,{ok:true});return;}
  if(['/api/login','/api/restore'].includes(url.pathname)&&req.method==='POST'){
   const restoring=url.pathname==='/api/restore';
   const data=restoring?await vault.load(session.id):await body(req);if(!data)throw new CampusError('VAULT','没有已保存账号，请重新登录。');if(typeof data.username!=='string'||!/^\d{5,20}$/.test(data.username)||typeof data.password!=='string'||!data.password||data.password.length>256)throw new CampusError('INPUT','请输入有效学号和密码。');
@@ -49,6 +50,8 @@ http.createServer(async(req,res)=>{
  if(url.pathname==='/api/links'&&req.method==='GET'){respond(res,200,await loadLinks());return;}
  if(url.pathname==='/api/classrooms/buildings'&&req.method==='GET'){respond(res,200,{buildings});return;}
  if(url.pathname==='/api/classrooms'&&req.method==='GET'){respond(res,200,await loadClassrooms(url.searchParams.get('building'),url.searchParams.get('date'),session.client?path=>withService(session,'https://webvpn.fudan.edu.cn/login?cas_login=true',client=>vpnClassroomRead(client,path)):undefined));return;}
+ if(url.pathname==='/api/chaoxing/logout'&&req.method==='POST'){await forgetChaoxing(session);respond(res,200,{ok:true});return;}
+ if(url.pathname.startsWith('/api/chaoxing/')&&req.method==='POST'){const action=url.pathname.split('/').pop();if(!['courses','start','status','qr'].includes(action)){respond(res,404,{});return;}const result=await chaoxingAction(session,action,url.searchParams.get('force')==='1');if(action==='qr'){res.writeHead(200,{'Content-Type':result.type});res.end(result.image);}else respond(res,200,result);return;}
  if(!session.client){respond(res,401,{message:'请先登录 UIS。'});return;}
  if(url.pathname==='/api/elearning'&&req.method==='POST'){respond(res,200,await courseCore(session,url.searchParams.get('force')==='1'));return;}
  if(url.pathname==='/api/elearning/navigation'&&req.method==='GET'){respond(res,200,await courseNavigation(session,url.searchParams.get('course')));return;}

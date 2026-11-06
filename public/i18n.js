@@ -55,3 +55,5 @@ Object.assign(dictionary,{'部分楼宇读取失败，结果可能不完整。':
 Object.assign(dictionary,{'课表未提供':'Schedule unavailable','心理学实验室':'Psychology laboratory','新媒体中心':'New Media Center','现代物理研究所':'Institute of Modern Physics','相辉堂':'Xianghui Hall'});
 
 Object.assign(dictionary,{'实验室或专用空间，使用前请确认预约条件。':'Laboratory or dedicated space: confirm reservation requirements before use.'});
+
+Object.assign(dictionary,{'学习通':'Chaoxing'});
