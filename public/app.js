@@ -53,7 +53,7 @@ $('refresh-exams').onclick=()=>task(loadExams);
 function examCountdownNode(exam,past){const e=node('span',past?'exam-state finished':'exam-state',examText(exam));e.dataset.examCountdown='';e.dataset.start=exam.startAt||'';e.dataset.end=exam.endAt||'';e.dataset.finished=String(!!exam.finished);return e;}
 async function loadElearning(){
  elearningAttempted=true;$('elearning-status').textContent=t('正在读取课程、作业和开放的模块，请稍候…');$('elearning-courses').replaceChildren();
- try{elearningResult=await api('elearning','POST',{});if(dashboardResult){dashboardResult.todo={courses:elearningResult.courses};renderDashboard(dashboardResult);}moduleState.clear();renderElearning(elearningResult);}catch(error){$('elearning-status').textContent=t(`读取失败：${error.message}。可点击刷新重试。`);}
+ try{elearningResult=await api('elearning','POST',{});if(dashboardResult){dashboardResult.todo={courses:elearningResult.courses};renderDashboard(dashboardResult,{authenticated});}moduleState.clear();renderElearning(elearningResult);}catch(error){$('elearning-status').textContent=t(`读取失败：${error.message}。可点击刷新重试。`);}
 }
 $('connect-elearning').onclick=()=>task(loadElearning);
 window.addEventListener('hashchange',selectPage);
@@ -69,7 +69,7 @@ const sidebarMedia=window.matchMedia('(max-width:760px)');let sidebarExplicit=fa
 function applySidebar(){document.body.classList.toggle('sidebar-collapsed',sidebarCollapsed);$('sidebar-toggle').setAttribute('aria-expanded',String(!sidebarCollapsed));$('sidebar-toggle').setAttribute('aria-label',t(sidebarCollapsed?'展开侧栏':'收起侧栏'));$('sidebar-toggle').title=t(sidebarCollapsed?'展开侧栏':'收起侧栏');}
 $('sidebar-toggle').onclick=()=>{sidebarExplicit=true;sidebarCollapsed=!sidebarCollapsed;try{localStorage.setItem('fdudash.sidebarCollapsed',String(sidebarCollapsed));}catch{}applySidebar();};
 $('language-toggle').onclick=()=>setLanguage(getLanguage()==='zh'?'en':'zh');
-window.addEventListener('fdudash-language',()=>{configureWeeks();render();message(statusSource);if(elearningResult)renderElearning(elearningResult);renderDashboard(dashboardResult);renderWeather($('home-weather'),weatherResult);renderWeather($('weather-content'),weatherResult,true,$('weather-campus').value);renderLinks($('links-content'),linksResult,$('links-search').value);renderGreeting();if(dashboardResult)$('dashboard-status').textContent=t('总览已更新');renderExams();controls();selectPage();applySidebar();});
+window.addEventListener('fdudash-language',()=>{configureWeeks();render();message(statusSource);if(elearningResult)renderElearning(elearningResult);renderDashboard(dashboardResult,{authenticated});renderWeather($('home-weather'),weatherResult);renderWeather($('weather-content'),weatherResult,true,$('weather-campus').value);renderLinks($('links-content'),linksResult,$('links-search').value);renderGreeting();if(dashboardResult)$('dashboard-status').textContent=t('总览已更新');renderExams();controls();selectPage();applySidebar();});
 applySidebar();
 
 sidebarMedia.addEventListener('change',()=>{if(!sidebarExplicit){sidebarCollapsed=sidebarMedia.matches;applySidebar();}});
@@ -77,9 +77,9 @@ sidebarMedia.addEventListener('change',()=>{if(!sidebarExplicit){sidebarCollapse
 for(const link of document.querySelectorAll('.main-nav a'))link.addEventListener('click',()=>{if(sidebarMedia.matches){sidebarCollapsed=true;try{localStorage.setItem('fdudash.sidebarCollapsed','true');}catch{}applySidebar();}});
 
 function renderGreeting(){$('dashboard-greeting').textContent=greeting(profile?.name,greetingSeed);}
-async function loadDashboard(){dashboardAttempted=true;$('dashboard-status').textContent=t('正在读取总览…');try{dashboardResult=await api(`dashboard?holiday=${$('bus-holiday').value}`);profile=dashboardResult.profile||profile;if(dashboardResult.weather){weatherResult=dashboardResult.weather;weatherAttempted=true;}renderDashboard(dashboardResult);renderWeather($('home-weather'),weatherResult);renderGreeting();$('dashboard-status').textContent=t('总览已更新');if(profile?.cached===false)$('dashboard-status').textContent+=' · '+t('姓名缓存未能保存，下次可能重新读取。');}catch(error){$('dashboard-status').textContent=error.message;}}
+async function loadDashboard(){dashboardAttempted=true;renderDashboard(dashboardResult,{authenticated});$('dashboard-status').textContent=t('正在读取总览…');try{dashboardResult=await api(`dashboard?holiday=${$('bus-holiday').value}`);profile=dashboardResult.profile||profile;if(dashboardResult.weather){weatherResult=dashboardResult.weather;weatherAttempted=true;}renderDashboard(dashboardResult,{authenticated});renderWeather($('home-weather'),weatherResult);renderGreeting();$('dashboard-status').textContent=t('总览已更新');if(profile?.cached===false)$('dashboard-status').textContent+=' · '+t('姓名缓存未能保存，下次可能重新读取。');}catch(error){$('dashboard-status').textContent=error.message;renderDashboard(dashboardResult,{authenticated,failed:true});}}
 $('refresh-dashboard').onclick=()=>task(loadDashboard);
-$('bus-holiday').onchange=()=>task(async()=>{try{const value=await api(`campus?service=bus&holiday=${$('bus-holiday').value}`);if(!dashboardResult)dashboardResult={};dashboardResult.bus=value;renderDashboard(dashboardResult);}catch(error){$('bus-content').textContent=error.message;}});
+$('bus-holiday').onchange=()=>task(async()=>{try{const value=await api(`campus?service=bus&holiday=${$('bus-holiday').value}`);if(!dashboardResult)dashboardResult={};dashboardResult.bus=value;renderDashboard(dashboardResult,{authenticated});}catch(error){$('bus-content').textContent=error.message;}});
 const settings=$('settings-popup'),settingsButton=$('settings-toggle');
 function closeSettings(){settings.hidden=true;settingsButton.setAttribute('aria-expanded','false');}
 settingsButton.onclick=()=>{settings.hidden=!settings.hidden;settingsButton.setAttribute('aria-expanded',String(!settings.hidden));};

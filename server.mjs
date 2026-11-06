@@ -1,3 +1,4 @@
+import {acquireSession} from './lib/session-queue.mjs';
 import {loadWeather} from './lib/weather.mjs';
 import {loadLinks,importLinks} from './lib/links.mjs';
 import http from 'node:http';
@@ -23,28 +24,30 @@ http.createServer(async(req,res)=>{
  const cookie=(req.headers.cookie||'').match(/(?:^|;\s*)fdudash=([a-f0-9]{64})(?:;|$)/)?.[1];let session=cookie&&sessions.get(cookie);
  if(session&&Date.now()-session.time>ttl){sessions.delete(cookie);session=null;}
  if(url.pathname==='/api/session'&&req.method==='GET'){
-  if(!session){const id=cookie||randomBytes(32).toString('hex');session={id,csrf:randomBytes(32).toString('hex'),time:Date.now(),client:null,busy:false};sessions.set(id,session);res.setHeader('Set-Cookie',`fdudash=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=31536000`);}
+  if(!session){const id=cookie||randomBytes(32).toString('hex');session={id,csrf:randomBytes(32).toString('hex'),time:Date.now(),client:null};sessions.set(id,session);res.setHeader('Set-Cookie',`fdudash=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=31536000`);}
   respond(res,200,{csrf:session.csrf,authenticated:!!session.client,profile:session.client?session.profile||null:null,hasSaved:await vault.has(session.id)});return;
  }
  if(!session){respond(res,401,{message:'本机会话已过期，请刷新页面。'});return;}
  const token=Buffer.from(String(req.headers['x-csrf-token']||'')),expected=Buffer.from(session.csrf);
  if(token.length!==expected.length||!timingSafeEqual(token,expected)){respond(res,403,{message:'请求校验失败，请刷新页面。'});return;}
  session.time=Date.now();
- if(url.pathname==='/api/logout'&&req.method==='POST'){if(session.busy){respond(res,409,{message:'请等待当前请求完成再退出。'});return;}await profileCache.forget(session.id);await vault.forget(session.id);session.profile=null;session.accountKey=null;session.client=null;session.courseIds=null;respond(res,200,{ok:true});return;}
- if(session.busy){respond(res,409,{message:'上一个请求仍在进行。'});return;}
- session.busy=true;
+ const release=await acquireSession(session);
  try{
+ if(res.destroyed)return;
+ if(sessions.get(session.id)!==session){respond(res,401,{message:'本机会话已过期，请刷新页面。'});return;}
+ session.time=Date.now();
+ if(url.pathname==='/api/logout'&&req.method==='POST'){await profileCache.forget(session.id);await vault.forget(session.id);session.profile=null;session.accountKey=null;session.client=null;session.courseIds=null;session.dashboardCache=null;respond(res,200,{ok:true});return;}
  if(['/api/login','/api/restore'].includes(url.pathname)&&req.method==='POST'){
   const restoring=url.pathname==='/api/restore';
   const data=restoring?await vault.load(session.id):await body(req);if(!data)throw new CampusError('VAULT','没有已保存账号，请重新登录。');if(typeof data.username!=='string'||!/^\d{5,20}$/.test(data.username)||typeof data.password!=='string'||!data.password||data.password.length>256)throw new CampusError('INPUT','请输入有效学号和密码。');
-  session.client=null;session.courseIds=null;const client=new FudanClient();let bundle,warning;try{bundle=await client.login(data.username,data.password);if(!restoring){try{if(data.remember)await vault.save(session.id,{username:data.username,password:data.password});else await vault.forget(session.id);}catch{warning='已登录，但加密保存失败，下次需要重新输入。';}}}finally{data.password='';}session.client=client;await restoreProfile(session,data.username);respond(res,200,{...bundle,warning,profile:session.profile});return;
+  session.dashboardCache=null;session.client=null;session.courseIds=null;const client=new FudanClient();let bundle,warning;try{bundle=await client.login(data.username,data.password);if(!restoring){try{if(data.remember)await vault.save(session.id,{username:data.username,password:data.password});else await vault.forget(session.id);}catch{warning='已登录，但加密保存失败，下次需要重新输入。';}}}finally{data.password='';}session.client=client;await restoreProfile(session,data.username);respond(res,200,{...bundle,warning,profile:session.profile});return;
  }
  if(url.pathname==='/api/weather'&&req.method==='GET'){respond(res,200,await loadWeather(url.searchParams.get('force')==='1'));return;}
  if(url.pathname==='/api/links'&&req.method==='GET'){respond(res,200,await loadLinks());return;}
  if(url.pathname==='/api/links/import'&&req.method==='POST'){respond(res,200,await importLinks());return;}
  if(!session.client){respond(res,401,{message:'请先登录 UIS。'});return;}
  if(url.pathname==='/api/elearning'&&req.method==='POST'){
-  const result=await elearningBundle(session);session.courseIds=new Set(result.courses.map(c=>c.id));respond(res,200,await session.client.elearningDashboard(result));return;
+  session.dashboardCache=null;const result=await elearningBundle(session);session.courseIds=new Set(result.courses.map(c=>c.id));respond(res,200,await session.client.elearningDashboard(result));return;
  }
  if(url.pathname==='/api/elearning/file'&&req.method==='GET'){
   const course=url.searchParams.get('course'),file=url.searchParams.get('file');if(!session.courseIds?.has(course))throw new CampusError('INPUT','请先加载此账号的课程。');
@@ -55,12 +58,14 @@ http.createServer(async(req,res)=>{
   const course=url.searchParams.get('course'),slug=url.searchParams.get('slug');if(!session.courseIds?.has(course)||!slug||slug.length>300)throw new CampusError('INPUT','课程页面地址无效。');
   respond(res,200,await session.client.coursePage(course,slug));return;
  }
- if(url.pathname==='/api/dashboard'&&req.method==='GET'){respond(res,200,await dashboardData(session,url.searchParams.get('holiday')==='1'));return;}
+ if(url.pathname==='/api/dashboard'&&req.method==='GET'){const holiday=url.searchParams.get('holiday')==='1',cached=session.dashboardCache;
+  const data=cached&&cached.holiday===holiday&&Date.now()-cached.time<10000?cached.data:await dashboardData(session,holiday);
+  if(data!==cached?.data)session.dashboardCache={holiday,data,time:Date.now()};respond(res,200,data);return;}
  if(url.pathname==='/api/campus'&&req.method==='GET'){respond(res,200,await readCampus(session,url.searchParams.get('service'),url.searchParams.get('holiday')==='1'));return;}
  if(url.pathname==='/api/exams'&&req.method==='GET'){respond(res,200,await session.client.exams());return;}
  if(url.pathname==='/api/semesters'  &&req.method==='GET'){respond(res,200,await session.client.getSemesters());return;}
  if(url.pathname==='/api/timetable'&&req.method==='GET'){respond(res,200,{courses:await session.client.timetable(url.searchParams.get('semester')||'')});return;}
  respond(res,404,{message:'接口不存在。'});
- }finally{session.busy=false;}
+ }finally{release();}
  }catch(error){if(error.code==='EXPIRED'){/* UI asks the user to authenticate again. */}respond(res,error instanceof CampusError?400:500,{code:error instanceof CampusError?error.code:'INTERNAL',message:error instanceof CampusError?error.message:'本机服务处理失败，未记录认证信息。'});}
 }).listen(port,'127.0.0.1',()=>console.log(`fdudash: ${origin} (local only; local encrypted credential storage)`));
