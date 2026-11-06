@@ -4,4 +4,4 @@ test('task badges count unfinished work only and do not depend on UI selection',
 
 test('traditional glyphs preserve mainland vocabulary and requested historical forms',()=>{setLanguage('zh-Hant');assert.equal(t('只有现在才加载应用程序和软件'),'祇有現在纔加載應用程序和軟件');assert.equal(t('课表'),'課表');setLanguage('zh');assert.equal(t('课表'),'课表');});
 
-test('Latin interface preserves course names and shortens multiple-room warning',()=>{setLanguage('en');assert.equal(t('教务返回多个教室'),'Multiple rooms detected');setLanguage('la');assert.equal(t('课表'),'Tabula lectionum');assert.equal(t('考试'),'Examina');assert.equal(t('当前没有待办作业或考试。'),'Nulla pensa vel examina agenda.');assert.equal(t('程序设计'),'程序设计');setLanguage('zh');});
+test('Latin interface preserves course names and shortens multiple-room warning',()=>{setLanguage('en');assert.equal(t('检测到多个教室'),'Multiple rooms detected');setLanguage('la');assert.equal(t('课表'),'Tabula lectionum');assert.equal(t('考试'),'Examina');assert.equal(t('当前没有待办作业或考试。'),'Nulla pensa vel examina agenda.');assert.equal(t('程序设计'),'程序设计');setLanguage('zh');});

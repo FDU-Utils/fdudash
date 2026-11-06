@@ -39,11 +39,11 @@ http.createServer(async(req,res)=>{
  if(res.destroyed)return;
  if(sessions.get(session.id)!==session){respond(res,401,{message:'本机会话已过期，请刷新页面。'});return;}
  session.time=Date.now();
- if(url.pathname==='/api/logout'&&req.method==='POST'){await profileCache.forget(session.id);await vault.forget(session.id);session.profile=null;session.accountKey=null;session.client=null;session.courseIds=null;session.dashboardCache=null;session.todoCache=null;session.learningCourses=null;session.examCache=null;respond(res,200,{ok:true});return;}
+ if(url.pathname==='/api/logout'&&req.method==='POST'){await profileCache.forget(session.id);await vault.forget(session.id);session.profile=null;session.accountKey=null;session.client=null;session.courseIds=null;session.dashboardCache=null;session.todoCache=null;session.learningCourses=null;session.examCache=null;session.homeWidgets=null;session.serviceAuthErrors=null;session.serviceAuth=null;respond(res,200,{ok:true});return;}
  if(['/api/login','/api/restore'].includes(url.pathname)&&req.method==='POST'){
   const restoring=url.pathname==='/api/restore';
   const data=restoring?await vault.load(session.id):await body(req);if(!data)throw new CampusError('VAULT','没有已保存账号，请重新登录。');if(typeof data.username!=='string'||!/^\d{5,20}$/.test(data.username)||typeof data.password!=='string'||!data.password||data.password.length>256)throw new CampusError('INPUT','请输入有效学号和密码。');
-  session.dashboardCache=null;session.todoCache=null;session.learningCourses=null;session.examCache=null;session.client=null;session.courseIds=null;const client=new FudanClient();let bundle,warning;try{bundle=await client.login(data.username,data.password);if(!restoring){try{if(data.remember)await vault.save(session.id,{username:data.username,password:data.password});else await vault.forget(session.id);}catch{warning='已登录，但加密保存失败，下次需要重新输入。';}}}finally{data.password='';}session.client=client;await restoreProfile(session,data.username);respond(res,200,{...bundle,warning,profile:session.profile});return;
+  session.dashboardCache=null;session.todoCache=null;session.learningCourses=null;session.examCache=null;session.homeWidgets=null;session.serviceAuthErrors=null;session.serviceAuth=null;session.client=null;session.courseIds=null;const client=new FudanClient(),profileReady=restoreProfile(session,data.username);let bundle,warning;try{bundle=await client.login(data.username,data.password);if(!restoring){try{if(data.remember)await vault.save(session.id,{username:data.username,password:data.password});else await vault.forget(session.id);}catch{warning='已登录，但加密保存失败，下次需要重新输入。';}}}finally{data.password='';}session.client=client;await profileReady;respond(res,200,{...bundle,warning,profile:session.profile});return;
  }
  if(url.pathname==='/api/weather'&&req.method==='GET'){respond(res,200,await loadWeather(url.searchParams.get('force')==='1'));return;}
  if(url.pathname==='/api/links'&&req.method==='GET'){respond(res,200,await loadLinks());return;}
@@ -62,9 +62,12 @@ http.createServer(async(req,res)=>{
   const course=url.searchParams.get('course'),slug=url.searchParams.get('slug');if(!session.courseIds?.has(course)||!slug||slug.length>300)throw new CampusError('INPUT','课程页面地址无效。');
   respond(res,200,await session.client.coursePage(course,slug));return;
  }
- if(url.pathname==='/api/dashboard'&&req.method==='GET'){const holiday=url.searchParams.get('holiday')==='1',cached=session.dashboardCache;
-  const force=url.searchParams.get('force')==='1';const data=!force&&cached&&cached.holiday===holiday&&Date.now()-cached.time<10000?cached.data:await dashboardData(session,holiday,force);
-  if(data!==cached?.data)session.dashboardCache={holiday,data,time:Date.now()};respond(res,200,data);return;}
+ if(url.pathname==='/api/dashboard'&&req.method==='GET'){
+  const holiday=url.searchParams.get('holiday')==='1',cached=session.dashboardCache,force=url.searchParams.get('force')==='1',reuse=!force&&cached&&cached.holiday===holiday&&Date.now()-cached.time<10000,stream=url.searchParams.get('stream')==='1';
+  const send=value=>{if(!res.destroyed)res.write(JSON.stringify(value)+'\n');};
+  if(stream){res.writeHead(200,{'Content-Type':'application/x-ndjson; charset=utf-8','X-Accel-Buffering':'no'});res.flushHeaders();send({type:'snapshot',data:reuse?cached.data:{profile:session.profile||null}});}
+  try{const data=reuse?cached.data:await dashboardData(session,holiday,force,stream?(key,value)=>send({type:'widget',key,value}):undefined);if(!reuse)session.dashboardCache={holiday,data,time:Date.now()};if(stream){send({type:'done',profile:data.profile,loadedAt:data.loadedAt});res.end();}else respond(res,200,data);}catch(error){if(!stream)throw error;send({type:'error',code:error.code||'INTERNAL',message:'首页读取中断，请刷新重试。'});res.end();}return;
+ }
  if(url.pathname==='/api/campus'&&req.method==='GET'){respond(res,200,await readCampus(session,url.searchParams.get('service'),url.searchParams.get('holiday')==='1'));return;}
  if(url.pathname==='/api/exams'&&req.method==='GET'){respond(res,200,await sessionExams(session,url.searchParams.get('force')==='1'));return;}
  if(url.pathname==='/api/semesters'  &&req.method==='GET'){respond(res,200,await session.client.getSemesters());return;}

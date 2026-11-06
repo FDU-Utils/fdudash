@@ -7,6 +7,9 @@ export function sortCourses(courses){return [...courses].sort((a,b)=>{
  return (timestamp(b.createdAt)??-Infinity)-(timestamp(a.createdAt)??-Infinity)||a.name.localeCompare(b.name);
 });}
 
-export function moduleTaskCount(course,module){if(module.id==='assignments')return pendingAssignments(course).length;if(module.id==='quizzes')return pendingAssignments(course).filter(a=>a.quizId!=null).length;if(module.id==='modules')return (module.data?.items||[]).reduce((total,g)=>total+(g.items||[]).filter(i=>i.completed===false).length,0);return 0;}
+export function moduleTaskCount(course,module){if(module.id==='assignments')return pendingAssignments(course).length;if(module.id==='announcements')return (module.data?.items||[]).filter(item=>item.unread===true).length;if(module.id==='quizzes')return pendingAssignments(course).filter(a=>a.quizId!=null).length;if(module.id==='modules')return (module.data?.items||[]).reduce((total,g)=>total+(g.items||[]).filter(i=>i.completed===false).length,0);return 0;}
 
 export function sortCompletedAssignments(items){return [...items].sort((a,b)=>(timestamp(b.dueAt)??timestamp(b.submittedAt)??-Infinity)-(timestamp(a.dueAt)??timestamp(a.submittedAt)??-Infinity)||a.name.localeCompare(b.name));}
+
+export function sortModules(modules){const order=['home','assignments','files','grades','announcements'];return [...modules].sort((a,b)=>(order.indexOf(a.id)<0?99:order.indexOf(a.id))-(order.indexOf(b.id)<0?99:order.indexOf(b.id)));}
+export const defaultModuleId=course=>(course.modules||[]).find(m=>m.id==='assignments')?.id||(course.modules||[]).find(m=>m.id==='home')?.id||null;

@@ -31,3 +31,5 @@ test('eLearning verifies authenticated API and handles login redirects',async()=
  c.request=async()=>({url:'https://id.fudan.edu.cn/ac/',text:'Login'});await assert.rejects(c.elearning(),e=>e.code==='ELEARNING_LOGIN');
  c.request=async(url)=>({url,text:'<html>not authenticated</html>'});await assert.rejects(c.elearning(),e=>e.code==='ELEARNING_UNSUPPORTED');
 });
+
+test('service SSO connects with an existing ticket without password authentication',async()=>{const client=new FudanClient(),calls=[];client.request=async input=>{calls.push(String(input));return calls.length===1?{url:'https://id.fudan.edu.cn/login',text:'<form id="logon" action="https://ecard.fudan.edu.cn/login"><input id="ticket" value="synthetic-ticket"></form>'}:{url:'https://ecard.fudan.edu.cn/epay',text:''};};await client.connectService('https://ecard.fudan.edu.cn/epay');assert.equal(calls.length,2);assert.ok(calls[1].startsWith('https://ecard.fudan.edu.cn/login?ticket='));assert.ok(calls.every(url=>!url.includes('authExecute')));});
