@@ -1,0 +1,9 @@
+node_modules/
+work/
+.env*
+*.log
+coverage/
+*.bin
+*.bin.tmp
+playwright-report/
+test-results/
