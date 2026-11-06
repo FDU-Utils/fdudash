@@ -6,7 +6,7 @@ import {vault} from './lib/vault.mjs';
 const port=Number(process.env.PORT||5173),origin=`http://127.0.0.1:${port}`;
 const sessions=new Map();const ttl=30*60*1000;
 setInterval(()=>{for(const [key,s] of sessions)if(Date.now()-s.time>ttl)sessions.delete(key);},60000).unref();
-const paths={'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/style.css':['style.css','text/css'],'/schedule.js':['schedule.js','text/javascript'],'/course-order.js':['course-order.js','text/javascript'],'/course-cards.js':['course-cards.js','text/javascript']};
+const paths={'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/style.css':['style.css','text/css'],'/schedule.js':['schedule.js','text/javascript'],'/course-order.js':['course-order.js','text/javascript'],'/course-cards.js':['course-cards.js','text/javascript'],'/i18n.js':['i18n.js','text/javascript']};
 function respond(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>8192)throw new CampusError('INPUT','请求过大。');}try{return JSON.parse(text);}catch{throw new CampusError('INPUT','请求格式错误。');}}
 http.createServer(async(req,res)=>{
@@ -54,6 +54,7 @@ http.createServer(async(req,res)=>{
   const course=url.searchParams.get('course'),slug=url.searchParams.get('slug');if(!session.courseIds?.has(course)||!slug||slug.length>300)throw new CampusError('INPUT','课程页面地址无效。');
   respond(res,200,await session.client.coursePage(course,slug));return;
  }
+ if(url.pathname==='/api/exams'&&req.method==='GET'){respond(res,200,await session.client.exams());return;}
  if(url.pathname==='/api/semesters'  &&req.method==='GET'){respond(res,200,await session.client.getSemesters());return;}
  if(url.pathname==='/api/timetable'&&req.method==='GET'){respond(res,200,{courses:await session.client.timetable(url.searchParams.get('semester')||'')});return;}
  respond(res,404,{message:'接口不存在。'});

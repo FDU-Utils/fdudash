@@ -6,3 +6,5 @@ export function sortCourses(courses){return [...courses].sort((a,b)=>{
  if(ab===0){const deadline=x=>Math.min(...x.map(t=>timestamp(t.dueAt)??Infinity));const diff=deadline(ap)-deadline(bp);if(diff)return diff;}
  return (timestamp(b.createdAt)??-Infinity)-(timestamp(a.createdAt)??-Infinity)||a.name.localeCompare(b.name);
 });}
+
+export function moduleTaskCount(course,module){if(module.id==='assignments')return pendingAssignments(course).length;if(module.id==='quizzes')return pendingAssignments(course).filter(a=>a.quizId!=null).length;if(module.id==='modules')return (module.data?.items||[]).reduce((total,g)=>total+(g.items||[]).filter(i=>i.completed===false).length,0);return 0;}
