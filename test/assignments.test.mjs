@@ -13,6 +13,6 @@ test('Canvas list follows pagination but rejects off-site links',async()=>{
  c.request=async(url)=>({url,text:'[]',link:'<https://evil.example/api/v1/courses>; rel="next"'});await assert.rejects(c.canvasList('/api/v1/courses'),e=>e.code==='UNSAFE_REDIRECT');
 });
 test('each course retains independent assignment result or error',async()=>{
- const c=new FudanClient();c.courseAssignments=async id=>{if(id==='2')throw new CampusError('UPSTREAM','当前课程无权限');return [assignmentInfo(assignment({workflow_state:'submitted'}),id)];};
- const result=await c.elearningDashboard({accessible:true,courses:[{id:'1',name:'甲'},{id:'2',name:'乙'}]});assert.equal(result.courses[0].assignments[0].completed,true);assert.equal(result.courses[1].error,'当前课程无权限');
+ const c=new FudanClient();c.canvasList=async()=>[];c.courseAssignments=async id=>{if(id==='2')throw new CampusError('UPSTREAM','当前课程无权限');return [assignmentInfo(assignment({workflow_state:'submitted'}),id)];};
+ const result=await c.elearningDashboard({accessible:true,courses:[{id:'1',name:'甲'},{id:'2',name:'乙'}]});assert.equal(result.courses.find(c=>c.id==='1').assignments[0].completed,true);assert.equal(result.courses.find(c=>c.id==='2').error,'当前课程无权限');
 });

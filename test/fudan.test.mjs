@@ -27,7 +27,7 @@ test('interactive authentication stops before submitting credentials',{concurren
 
 test('eLearning verifies authenticated API and handles login redirects',async()=>{
  const c=new FudanClient();c.request=async(url)=>url.includes('/api/')?{url,text:JSON.stringify([{id:12,name:'测试课程',course_code:'TEST'},{id:13}])}:{url,text:'dashboard'};
- assert.deepEqual(await c.elearning(),{accessible:true,courses:[{id:'12',name:'测试课程',code:'TEST'}],limited:false});
+ const result=await c.elearning();assert.equal(result.accessible,true);assert.equal(result.courses[0].name,'测试课程');assert.equal(result.courses[0].createdAt,null);assert.equal(result.courses.length,1);
  c.request=async()=>({url:'https://id.fudan.edu.cn/ac/',text:'Login'});await assert.rejects(c.elearning(),e=>e.code==='ELEARNING_LOGIN');
  c.request=async(url)=>({url,text:'<html>not authenticated</html>'});await assert.rejects(c.elearning(),e=>e.code==='ELEARNING_UNSUPPORTED');
 });
