@@ -13,3 +13,7 @@ test('duplicate activities merge and transitive conflicts have disjoint lanes',(
 test('Sunday-based semester dates become Monday weeks in Shanghai time',()=>{
  assert.deepEqual(weekRange('2026-09-06',1),['2026-09-07','2026-09-13']);assert.deepEqual(weekRange('2026-09-06',2),['2026-09-14','2026-09-20']);assert.equal(teachingWeek('2026-09-06',Date.parse('2026-09-14T00:00:00+08:00')),2);assert.equal(teachingWeek('2026-09-06',Date.parse('2026-09-13T23:59:59+08:00')),1);assert.deepEqual(weekRange('2026-09-07',1),['2026-09-07','2026-09-13']);assert.equal(weekRange(null,1),null);
 });
+
+test('one teaching activity with two rooms renders once; different lesson IDs stay separate',()=>{
+ const base={...course('程序设计',1,2,[2,3]),lessonId:'101',day:3};const result=layoutWeek([base,{...base,room:'另一教室'}],2);assert.equal(result.length,1);assert.equal(result[0].rooms.length,2);assert.equal(result[0].lanes,1);assert.match(result[0].room,/另一教室/);assert.equal(layoutWeek([base,{...base,lessonId:'102'}],2).length,2);
+});

@@ -16,7 +16,13 @@ export function weekRange(startDate,week){
 export function layoutWeek(items,week){
  if(!Number.isInteger(week)||week<1)return [];
  const unique=new Map();
- for(const c of items){if(!c.weeks.map(Number).includes(week))continue;const key=JSON.stringify([c.name,c.day,c.start,c.end,c.room,[...c.teachers].sort()]);if(!unique.has(key))unique.set(key,{...c});}
+ for(const c of items){
+  if(!c.weeks.map(Number).includes(week))continue;
+  const identity=c.lessonId?`lesson:${c.lessonId}`:JSON.stringify([c.name,[...c.teachers].sort()]);
+  const key=JSON.stringify([identity,c.day,c.start,c.end]),previous=unique.get(key);
+  if(previous){previous.rooms=[...new Set([...previous.rooms,c.room].filter(Boolean))];previous.room=previous.rooms.join(' / ');previous.teachers=[...new Set([...previous.teachers,...c.teachers])];}
+  else unique.set(key,{...c,teachers:[...c.teachers],rooms:[c.room]});
+ }
  const result=[];
  for(let day=1;day<=7;day++){
   const sorted=[...unique.values()].filter(c=>c.day===day).sort((a,b)=>a.start-b.start||a.end-b.end||a.name.localeCompare(b.name));

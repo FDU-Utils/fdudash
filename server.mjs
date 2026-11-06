@@ -43,7 +43,7 @@ http.createServer(async(req,res)=>{
    const info=await vault.load(session.id);if(!info)throw new CampusError('ELEARNING_LOGIN','请勾选记住账号并重新登录，以建立 eLearning 服务会话。');
    try{await session.client.login(info.username,info.password,'https://elearning.fudan.edu.cn/dash');}finally{info.password='';}
    result=await session.client.elearning();
-  }respond(res,200,result);return;
+  }respond(res,200,await session.client.elearningDashboard(result));return;
  }
  if(url.pathname==='/api/semesters' &&req.method==='GET'){respond(res,200,await session.client.getSemesters());return;}
  if(url.pathname==='/api/timetable'&&req.method==='GET'){respond(res,200,{courses:await session.client.timetable(url.searchParams.get('semester')||'')});return;}
