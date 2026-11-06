@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node server.mjs",
     "test": "node --test",
-    "test:ui": "node scripts/check-ui.mjs"
+    "test:ui": "node scripts/check-ui.mjs",
+    "check:public": "node scripts/check-public.mjs"
   },
   "dependencies": {
     "cheerio": "^1.1.2",

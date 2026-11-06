@@ -7,3 +7,21 @@ coverage/
 *.bin.tmp
 playwright-report/
 test-results/
+
+# Local-only plans, state, history and sensitive material
+/docs/
+/private/
+/cache/
+/.cache/
+*.sqlite*
+*.db
+*.har
+*.pem
+*.key
+.secret*
+cookies*.json
+session*.json
+profile*.json
+*history*.json
+*metrics*.json
+*clipboard*

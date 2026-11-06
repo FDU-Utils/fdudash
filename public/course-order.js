@@ -8,3 +8,5 @@ export function sortCourses(courses){return [...courses].sort((a,b)=>{
 });}
 
 export function moduleTaskCount(course,module){if(module.id==='assignments')return pendingAssignments(course).length;if(module.id==='quizzes')return pendingAssignments(course).filter(a=>a.quizId!=null).length;if(module.id==='modules')return (module.data?.items||[]).reduce((total,g)=>total+(g.items||[]).filter(i=>i.completed===false).length,0);return 0;}
+
+export function sortCompletedAssignments(items){return [...items].sort((a,b)=>(timestamp(b.dueAt)??timestamp(b.submittedAt)??-Infinity)-(timestamp(a.dueAt)??timestamp(a.submittedAt)??-Infinity)||a.name.localeCompare(b.name));}
