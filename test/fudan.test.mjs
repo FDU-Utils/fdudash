@@ -24,3 +24,10 @@ test('complete UIS flow encrypts password, stores cookies and reads timetable',{
  try{const client=new FudanClient();assert.equal((await client.login('123456','test-secret')).defaultId,'42');assert.deepEqual(await client.timetable('42'),[]);assert.equal(calls,9);assert.equal(await new FudanClient().jar.getCookieString(TABLE),'');}finally{globalThis.fetch=original;}
 });
 test('interactive authentication stops before submitting credentials',{concurrency:false},async()=>{const c=new FudanClient();let calls=0;c.request=async()=>({url:'https://id.fudan.edu.cn/#/login?lck=x&entityId=y',text:''});c.json=async()=>{calls++;return {second:true};};await assert.rejects(c.login('123456','unused'),e=>e.code==='INTERACTION_REQUIRED');assert.equal(calls,1);});
+
+test('eLearning verifies authenticated API and handles login redirects',async()=>{
+ const c=new FudanClient();c.request=async(url)=>url.includes('/api/')?{url,text:JSON.stringify([{id:12,name:'测试课程',course_code:'TEST'},{id:13}])}:{url,text:'dashboard'};
+ assert.deepEqual(await c.elearning(),{accessible:true,courses:[{id:'12',name:'测试课程',code:'TEST'}],limited:false});
+ c.request=async()=>({url:'https://id.fudan.edu.cn/ac/',text:'Login'});await assert.rejects(c.elearning(),e=>e.code==='ELEARNING_LOGIN');
+ c.request=async(url)=>({url,text:'<html>not authenticated</html>'});await assert.rejects(c.elearning(),e=>e.code==='ELEARNING_UNSUPPORTED');
+});

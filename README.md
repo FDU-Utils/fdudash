@@ -1,6 +1,6 @@
 # fdudash
 
-HTML + 本机 Node.js 的复旦个人 dashboard 原型。Tauri 后置。当前仅实现 UIS 密码认证流程、学期读取、本科生课表查询与明确标识的演示模式；真实账号尚待本机联调。
+HTML + 本机 Node.js 的复旦个人 dashboard 原型。Tauri 后置。当前实现 UIS 密码认证、本地加密记住账号、按周本科生课表、eLearning 只读课程列表和明确标识的演示模式；UIS 与 eLearning 已完成本机真实账号验证。
 
 ## 启动（全部在 WSL）
 
@@ -32,3 +32,9 @@ npm start
 认证协议、接口和课表字段参考 DanXi-Dev/DanXi commit 3c1f5f026fbc7ca50e151865f813cdb381807abe：lib/repository/fdu/neo_login_tool.dart、time_table_repository.dart、lib/model/time_table.dart。本项目采用 GPL-3.0-or-later，保留 DanXi 参考归属；参考源码位于忽略的 work/DanXi，不纳入项目发布。
 
 长期范围见 docs/project-goals.md。
+
+## 每周课表与 eLearning
+
+- 课表提供上一周、下一周、本周、周选择与周一至周日日期范围。只渲染所选教学周，合并同周重复课程；同周真实冲突按整组安排并排，不遮挡。日期按北京时间计算。
+- 登录 UIS 后点击“连接并读取课程”，本机复用会话；若需要独立票据，使用已保存的本机账号建立 eLearning 会话一次。只读取活动课程列表，不提交作业或修改课程。最多展示 100 门课程，达到上限会提示。
+- eLearning 实际访问已验证；自动测试使用虚构课程，个人课程、凭据、会话均不写入仓库。
