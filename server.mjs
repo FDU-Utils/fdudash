@@ -1,3 +1,4 @@
+import {localBridge,parseWebOrigins} from './lib/device-bridge.mjs';
 import {chaoxingAction,forgetChaoxing} from './lib/chaoxing.mjs';
 import {vpnClassroomRead} from './lib/webvpn.mjs';
 import {loadClassrooms,buildings} from './lib/classrooms.mjs';
@@ -12,23 +13,29 @@ import {FudanClient,CampusError} from './lib/fudan.mjs';
 import {vault,profileCache} from './lib/vault.mjs';
 import {restoreProfile,dashboardData,readCampus,elearningBundle,withService,sessionExams} from './lib/dashboard.mjs';
 const port=Number(process.env.PORT||5173),origin=`http://127.0.0.1:${port}`;
+let bridgeConfig={};try{bridgeConfig=JSON.parse(await readFile(new URL('./connector-config.json',import.meta.url),'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
+const bridge=localBridge(parseWebOrigins(process.env.FDUDASH_WEB_ORIGINS||bridgeConfig.webOrigins?.join(',')||''),process.env.FDUDASH_DEVICE_DIR);await bridge.ready;
 const sessions=new Map();const ttl=30*60*1000;
 setInterval(()=>{for(const [key,s] of sessions)if(Date.now()-s.time>ttl)sessions.delete(key);},60000).unref();
-const paths={'/chaoxing-cards.js':['chaoxing-cards.js','text/javascript'],'/chaoxing-view.js':['chaoxing-view.js','text/javascript'],'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/style.css':['style.css','text/css'],'/schedule.js':['schedule.js','text/javascript'],'/course-order.js':['course-order.js','text/javascript'],'/course-cards.js':['course-cards.js','text/javascript'],'/i18n.js':['i18n.js','text/javascript'],'/time.js':['time.js','text/javascript'],'/dashboard-view.js':['dashboard-view.js','text/javascript'],'/weather-view.js':['weather-view.js','text/javascript'],'/links-view.js':['links-view.js','text/javascript'],'/latin.js':['latin.js','text/javascript'],'/traditional.js':['traditional.js','text/javascript'],'/classrooms.js':['classrooms.js','text/javascript'],'/assets/fudan-emblem.png':['assets/fudan-emblem.png','image/png']};
+const paths={'/transport.js':['transport.js','text/javascript'],'/bridge-ui.js':['bridge-ui.js','text/javascript'],'/connect':['connect.html','text/html'],'/chaoxing-cards.js':['chaoxing-cards.js','text/javascript'],'/chaoxing-view.js':['chaoxing-view.js','text/javascript'],'/':['index.html','text/html'],'/app.js':['app.js','text/javascript'],'/style.css':['style.css','text/css'],'/schedule.js':['schedule.js','text/javascript'],'/course-order.js':['course-order.js','text/javascript'],'/course-cards.js':['course-cards.js','text/javascript'],'/i18n.js':['i18n.js','text/javascript'],'/time.js':['time.js','text/javascript'],'/dashboard-view.js':['dashboard-view.js','text/javascript'],'/weather-view.js':['weather-view.js','text/javascript'],'/links-view.js':['links-view.js','text/javascript'],'/latin.js':['latin.js','text/javascript'],'/traditional.js':['traditional.js','text/javascript'],'/classrooms.js':['classrooms.js','text/javascript'],'/assets/fudan-emblem.png':['assets/fudan-emblem.png','image/png']};
 function respond(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(data));}
 async function body(req){let text='';for await(const chunk of req){text+=chunk;if(Buffer.byteLength(text)>8192)throw new CampusError('INPUT','请求过大。');}try{return JSON.parse(text);}catch{throw new CampusError('INPUT','请求格式错误。');}}
 http.createServer(async(req,res)=>{
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
  if(req.headers.host!==`127.0.0.1:${port}`){respond(res,403,{message:'请使用本机 127.0.0.1 地址。'});return;}
- const url=new URL(req.url,origin);
+ const url=new URL(req.url,origin);let deviceId=null;const requestOrigin=req.headers.origin,isRemote=!!requestOrigin&&requestOrigin!==origin;
  try{
+ if(isRemote){if(!bridge.accepts(requestOrigin)){respond(res,403,{message:'不允许跨站请求。'});return;}res.setHeader('Access-Control-Allow-Origin',requestOrigin);res.setHeader('Vary','Origin');res.setHeader('Access-Control-Allow-Headers','Content-Type,X-CSRF-Token,X-FDUDash-Device');res.setHeader('Access-Control-Allow-Methods','GET,POST,OPTIONS');res.setHeader('Access-Control-Expose-Headers','X-FDUDash-Device-Expired');if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}if(url.pathname==='/bridge/pair'&&req.method==='POST'){try{respond(res,200,await bridge.pair((await body(req)).code,requestOrigin));}catch{respond(res,403,{message:'配对码无效、已过期或尝试过于频繁。'});}return;}deviceId=await bridge.authenticate(String(req.headers['x-fdudash-device']||''),requestOrigin);if(!deviceId){res.setHeader('X-FDUDash-Device-Expired','1');respond(res,401,{message:'请重新配对本机连接器。'});return;}if(!url.pathname.startsWith('/api/')){respond(res,403,{});return;}}
+ if(!isRemote&&url.pathname==='/bridge/health'&&req.method==='GET'){respond(res,200,{service:'fdudash-connector',origins:[...bridge.origins]});return;}
+ if(!isRemote&&['/bridge/code','/bridge/revoke'].includes(url.pathname)){const id=(req.headers.cookie||'').match(/(?:^|;\s*)fdudash=([a-f0-9]{64})(?:;|$)/)?.[1],session=id&&sessions.get(id);if(!session||!session.csrf||req.headers['x-csrf-token']!==session.csrf){respond(res,403,{});return;}if(url.pathname==='/bridge/code'&&req.method==='GET'){respond(res,200,await bridge.code(id));return;}if(url.pathname==='/bridge/revoke'&&req.method==='POST'){await bridge.revoke(id);respond(res,200,{ok:true});return;}respond(res,405,{});return;}
+
  if(paths[url.pathname]&&req.method==='GET'){const [file,type]=paths[url.pathname];if(type.startsWith('image/'))res.setHeader('Cache-Control','public, max-age=86400');res.writeHead(200,{'Content-Type':type.startsWith('image/')?type:`${type}; charset=utf-8`});res.end(await readFile(new URL(`./public/${file}`,import.meta.url)));return;}
  if(!url.pathname.startsWith('/api/')){respond(res,404,{message:'未找到页面。'});return;}
- if(req.headers.origin&&req.headers.origin!==origin){respond(res,403,{message:'不允许跨站请求。'});return;}
- const cookie=(req.headers.cookie||'').match(/(?:^|;\s*)fdudash=([a-f0-9]{64})(?:;|$)/)?.[1];let session=cookie&&sessions.get(cookie);
+ if(isRemote&&!deviceId){respond(res,403,{message:'不允许跨站请求。'});return;}
+ const cookie=deviceId||(req.headers.cookie||'').match(/(?:^|;\s*)fdudash=([a-f0-9]{64})(?:;|$)/)?.[1];let session=cookie&&sessions.get(cookie);
  if(session&&Date.now()-session.time>ttl){sessions.delete(cookie);session=null;}
  if(url.pathname==='/api/session'&&req.method==='GET'){
-  if(!session){const id=cookie||randomBytes(32).toString('hex');session={id,csrf:randomBytes(32).toString('hex'),time:Date.now(),client:null};sessions.set(id,session);res.setHeader('Set-Cookie',`fdudash=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=31536000`);}
+  if(!session){const id=cookie||randomBytes(32).toString('hex');session={id,csrf:randomBytes(32).toString('hex'),time:Date.now(),client:null};sessions.set(id,session);if(!isRemote)res.setHeader('Set-Cookie',`fdudash=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=31536000`);}
   respond(res,200,{csrf:session.csrf,authenticated:!!session.client,profile:session.client?session.profile||null:null,hasSaved:await vault.has(session.id)});return;
  }
  if(!session){respond(res,401,{message:'本机会话已过期，请刷新页面。'});return;}

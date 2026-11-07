@@ -25,3 +25,6 @@ profile*.json
 *history*.json
 *metrics*.json
 *clipboard*
+
+/dist/
+/connector-config.json

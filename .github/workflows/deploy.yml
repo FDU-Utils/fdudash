@@ -1,0 +1,92 @@
+name: Test, build and deploy
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: fdudash-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      WEB_ORIGIN: ${{ vars.FDUDASH_ORIGIN }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check:public
+      - run: npm test
+      - if: runner.os == 'Linux'
+        run: npx playwright install --with-deps chromium
+      - if: runner.os == 'Windows'
+        run: npx playwright install chromium
+      - run: npm run test:ui
+      - if: runner.os == 'Linux'
+        run: node scripts/build-web.mjs
+      - if: runner.os == 'Linux'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: website
+          path: dist/web
+          if-no-files-found: error
+      - if: runner.os == 'Windows'
+        run: npm prune --omit=dev
+      - if: runner.os == 'Windows'
+        run: node scripts/build-connector.mjs
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist/connector/* -DestinationPath dist/fdudash-connector-windows-x64.zip
+      - if: runner.os == 'Windows'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: connector-windows
+          path: dist/fdudash-connector-windows-x64.zip
+          if-no-files-found: error
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: website
+          path: site
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: connector-windows
+          path: site/downloads
+      - name: Prepare release and SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.FDUDASH_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.FDUDASH_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/fdudash_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/fdudash_deploy ~/.ssh/known_hosts
+          sha256sum site/downloads/*.zip > site/downloads/SHA256SUMS
+          tar -czf release.tar.gz -C site .
+      - name: Publish atomically
+        env:
+          DEPLOY_HOST: ${{ vars.FDUDASH_DEPLOY_HOST }}
+          SITE_ORIGIN: ${{ vars.FDUDASH_ORIGIN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]]
+          ssh -i ~/.ssh/fdudash_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes "fdudash-deploy@$DEPLOY_HOST" "set -eu; umask 022; mkdir -p /srv/fdudash/releases/$GITHUB_SHA; tar -xzf - -C /srv/fdudash/releases/$GITHUB_SHA; test -f /srv/fdudash/releases/$GITHUB_SHA/deployment.json; test -f /srv/fdudash/releases/$GITHUB_SHA/downloads/fdudash-connector-windows-x64.zip; ln -sfn /srv/fdudash/releases/$GITHUB_SHA /srv/fdudash/releases/current-next; mv -Tf /srv/fdudash/releases/current-next /srv/fdudash/releases/current" < release.tar.gz
+          curl --fail --retry 3 "$SITE_ORIGIN/deployment.json" | jq -e --arg version "$GITHUB_SHA" '.version == $version'

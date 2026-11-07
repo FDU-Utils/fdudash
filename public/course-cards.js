@@ -1,3 +1,4 @@
+import {apiFetch} from './transport.js';
 import {t,formatDate,errorText} from './i18n.js';
 import {sortCourses,sortAssignments,pendingAssignments,moduleTaskCount,sortCompletedAssignments,sortModules,defaultModuleId} from './course-order.js';
 const date=formatDate;
@@ -7,7 +8,7 @@ function details(title,child,cls=''){const d=el('details',cls);d.append(el('summ
 function size(bytes){return bytes>=1048576?(bytes/1048576).toFixed(1)+' MB':bytes>=1024?Math.round(bytes/1024)+' KB':bytes+' B';}
 async function fileAction(course,file,preview,context,notice){
  const popup=preview?window.open('about:blank','_blank'):null;if(popup)popup.opener=null;
- try{notice.textContent=t('正在读取文件…');const response=await fetch(`/api/elearning/file?course=${encodeURIComponent(course.id)}&file=${encodeURIComponent(file.id)}`,{headers:{'X-CSRF-Token':context.csrf()}});
+ try{notice.textContent=t('正在读取文件…');const response=await apiFetch(`/api/elearning/file?course=${encodeURIComponent(course.id)}&file=${encodeURIComponent(file.id)}`,{headers:{'X-CSRF-Token':context.csrf()}});
   if(!response.ok){const e=await response.json();throw Error(errorText(e.code,e.message||'文件读取失败'));}const blob=await response.blob(),url=URL.createObjectURL(blob);
   if(popup){popup.location.href=url;}else{const a=el('a','');a.href=url;a.download=file.name;a.click();}setTimeout(()=>URL.revokeObjectURL(url),120000);notice.textContent=t(popup?'预览已打开。':preview?'浏览器未打开预览窗口，已改为下载。':'文件已交给浏览器下载。');
  }catch(error){if(popup)popup.close();notice.textContent=t(error.message);}

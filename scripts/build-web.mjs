@@ -1,0 +1,5 @@
+import {cp,mkdir,readFile,writeFile} from 'node:fs/promises';import {fileURLToPath} from 'node:url';
+const root=new URL('../',import.meta.url),out=new URL('../dist/web/',import.meta.url),origin=process.env.WEB_ORIGIN;
+if(!origin||new URL(origin).protocol!=='https:'||new URL(origin).origin!==origin)throw Error('WEB_ORIGIN must be an exact HTTPS origin');
+if(process.env.GITHUB_ACTIONS!=='true')throw Error('Release builds run in GitHub Actions');
+await mkdir(out,{recursive:true});await cp(new URL('public/',root),out,{recursive:true,filter:src=>!['connect.html','bridge-ui.js'].includes(src.split(/[\\/]/).pop())});let html=await readFile(new URL('index.html',out),'utf8');html=html.replace('src="/app.js"','src="/bootstrap.js"').replace('<body>','<body class="device-required">');await writeFile(new URL('index.html',out),html);await writeFile(new URL('deployment.json',out),JSON.stringify({mode:'cloud',version:process.env.GITHUB_SHA,siteOrigin:origin,agentOrigin:'http://127.0.0.1:5173',downloadURL:'/downloads/fdudash-connector-windows-x64.zip'}));await cp(new URL('LICENSE',root),new URL('LICENSE',out));console.log('Static website artifact prepared.');

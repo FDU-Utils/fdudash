@@ -1,3 +1,4 @@
+import {apiFetch} from './transport.js';
 import {initChaoxing,maybeLoadChaoxing,resetChaoxing} from './chaoxing-view.js';
 import {renderRooms,periodTimes,validateRanges,campusRank} from './classrooms.js';
 import {renderWeather} from './weather-view.js';
@@ -12,7 +13,7 @@ let csrf='',authenticated=false,bundle=null,items=[],busy=false,hasSaved=false,e
 const $=id=>document.getElementById(id),form=$('login'),status=$('status');
 function message(text){statusSource=text;status.textContent=t(text);}
 function controls(){for(const e of form.elements)e.disabled=busy||authenticated;$('semester').disabled=busy||!bundle;$('refresh').disabled=busy||!authenticated;$('account-action').textContent=t(authenticated?'退出并忘记账号':'登录');$('account-action').disabled=busy;$('connect-elearning').disabled=busy||!authenticated;$('login-panel').hidden=authenticated||!loginRequested;$('refresh-dashboard').disabled=busy||!authenticated;$('bus-holiday').disabled=busy||!authenticated;$('refresh-exams').disabled=busy||!authenticated;$('refresh-weather').disabled=busy;}
-async function api(path,method='GET',data){const res=await fetch(`/api/${path}`,{method,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:data?JSON.stringify(data):undefined});const result=await res.json();if(!res.ok)throw Error(errorText(result.code,result.message||'请求失败'));return result;}
+async function api(path,method='GET',data){const res=await apiFetch(`/api/${path}`,{method,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:data?JSON.stringify(data):undefined});const result=await res.json();if(!res.ok)throw Error(errorText(result.code,result.message||'请求失败'));return result;}
 initChaoxing({api,csrf:()=>csrf});
 async function task(fn){if(busy)return;busy=true;controls();try{await fn();}catch(e){message(e.message);}finally{busy=false;controls();maybeLoadActive();}}
 function showBundle(value){bundle=value;$('semester').replaceChildren(...value.semesters.map(s=>new Option(s.name,s.id)));$('semester').value=value.defaultId;items=[];render();}
@@ -99,7 +100,7 @@ for(const link of document.querySelectorAll('.main-nav a'))link.addEventListener
 
 function renderGreeting(){$('dashboard-greeting').textContent=greeting(profile?.name,greetingSeed);}
 async function dashboardRequest(force){
- const response=await fetch(`/api/dashboard?holiday=${$('bus-holiday').value}&stream=1${force?'&force=1':''}`,{headers:{'X-CSRF-Token':csrf}});
+ const response=await apiFetch(`/api/dashboard?holiday=${$('bus-holiday').value}&stream=1${force?'&force=1':''}`,{headers:{'X-CSRF-Token':csrf}});
  if(!response.ok){const error=await response.json();throw Error(errorText(error.code,error.message));}
  if(!response.headers.get('content-type')?.includes('application/x-ndjson'))return response.json();
  const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',result={},complete=false;
