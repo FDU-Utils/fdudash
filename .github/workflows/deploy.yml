@@ -78,7 +78,7 @@ jobs:
           printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/fdudash_deploy
           printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/fdudash_deploy ~/.ssh/known_hosts
-          sha256sum site/downloads/*.zip > site/downloads/SHA256SUMS
+          (cd site/downloads && sha256sum *.zip > SHA256SUMS)
           tar -czf release.tar.gz -C site .
       - name: Publish atomically
         env:
@@ -89,4 +89,4 @@ jobs:
           set -euo pipefail
           [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]]
           ssh -i ~/.ssh/fdudash_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes "fdudash-deploy@$DEPLOY_HOST" "set -eu; umask 022; mkdir -p /srv/fdudash/releases/$GITHUB_SHA; tar -xzf - -C /srv/fdudash/releases/$GITHUB_SHA; test -f /srv/fdudash/releases/$GITHUB_SHA/deployment.json; test -f /srv/fdudash/releases/$GITHUB_SHA/downloads/fdudash-connector-windows-x64.zip; ln -sfn /srv/fdudash/releases/$GITHUB_SHA /srv/fdudash/releases/current-next; mv -Tf /srv/fdudash/releases/current-next /srv/fdudash/releases/current" < release.tar.gz
-          curl --fail --retry 3 "$SITE_ORIGIN/deployment.json" | jq -e --arg version "$GITHUB_SHA" '.version == $version'
+          curl --fail --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 10 --max-time 30 "$SITE_ORIGIN/deployment.json" | jq -e --arg version "$GITHUB_SHA" '.version == $version'
