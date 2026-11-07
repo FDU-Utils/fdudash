@@ -35,9 +35,9 @@ test('eLearning verifies authenticated API and handles login redirects',async()=
 test('service SSO connects with an existing ticket without password authentication',async()=>{const client=new FudanClient(),calls=[];client.request=async input=>{calls.push(String(input));return calls.length===1?{url:'https://id.fudan.edu.cn/login',text:'<form id="logon" action="https://ecard.fudan.edu.cn/login"><input id="ticket" value="synthetic-ticket"></form>'}:{url:'https://ecard.fudan.edu.cn/epay',text:''};};await client.connectService('https://ecard.fudan.edu.cn/epay');assert.equal(calls.length,2);assert.ok(calls[1].startsWith('https://ecard.fudan.edu.cn/login?ticket='));assert.ok(calls.every(url=>!url.includes('authExecute')));});
 
 
-test('Chaoxing OAuth follows the official broker without forwarding UIS credentials', async () => {
+for (const brokerHost of ['passport2.chaoxing.com','passport2-api.chaoxing.com']) test('Chaoxing OAuth follows '+brokerHost+' without forwarding UIS credentials', async () => {
  const sso='https://fysso.chaoxing.com/oauthsso/fudan';
- const broker='https://passport2.chaoxing.com/sso';
+ const broker='https://'+brokerHost+'/sso';
  const portal='https://fudan.mooc.chaoxing.com/portal';
  const {publicKey}=generateKeyPairSync('rsa',{modulusLength:2048});
  const key=publicKey.export({type:'spki',format:'pem'}).toString().replace(/-----[^\n]+-----|\s/g,'');
@@ -63,4 +63,13 @@ test('Chaoxing OAuth follows the official broker without forwarding UIS credenti
   const result=await client.login('123456','synthetic-only',sso);
   assert.equal(result.url,portal);
  }finally{globalThis.fetch=original;}
+});
+
+test('Chaoxing API broker remains scoped to HTTPS SSO',()=>{
+ const broker='https://passport2-api.chaoxing.com';
+ assert.equal(safeUrl(broker,true).origin,broker);
+ for(const url of [broker,broker+'.evil.example','http://passport2-api.chaoxing.com',broker+':8443','https://user:pass@passport2-api.chaoxing.com']) {
+  assert.throws(()=>safeUrl(url),{code:'UNSAFE_REDIRECT'});
+  if(url!==broker)assert.throws(()=>safeUrl(url,true),{code:'UNSAFE_REDIRECT'});
+ }
 });
