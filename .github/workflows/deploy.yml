@@ -40,6 +40,18 @@ jobs:
           name: website
           path: dist/web
           if-no-files-found: error
+      - if: runner.os == 'Linux'
+        run: |
+          npm prune --omit=dev
+          mkdir -p dist/backend
+          cp -r server.mjs lib public node_modules package.json dist/backend/
+          cp "$(command -v node)" dist/backend/node
+          tar -czf dist/backend.tar.gz -C dist/backend .
+      - if: runner.os == 'Linux'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: backend
+          path: dist/backend.tar.gz
       - if: runner.os == 'Windows'
         run: npm prune --omit=dev
       - if: runner.os == 'Windows'
@@ -68,6 +80,10 @@ jobs:
         with:
           name: connector-windows
           path: site/downloads
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: backend
+          path: backend
       - name: Prepare release and SSH
         env:
           DEPLOY_KEY: ${{ secrets.FDUDASH_DEPLOY_KEY }}
@@ -81,6 +97,8 @@ jobs:
           printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/fdudash_deploy ~/.ssh/known_hosts
           (cd site/downloads && sha256sum *.zip > SHA256SUMS)
+          mkdir site/.backend
+          tar -xzf backend/backend.tar.gz -C site/.backend
           tar -czf release.tar.gz -C site .
       - name: Publish atomically
         env:
@@ -90,5 +108,6 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$GITHUB_SHA" =~ ^[a-f0-9]{40}$ ]]
-          ssh -i ~/.ssh/fdudash_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes "fdudash-deploy@$DEPLOY_HOST" "set -eu; umask 022; mkdir -p /srv/fdudash/releases/$GITHUB_SHA; tar -xzf - -C /srv/fdudash/releases/$GITHUB_SHA; test -f /srv/fdudash/releases/$GITHUB_SHA/deployment.json; test -f /srv/fdudash/releases/$GITHUB_SHA/downloads/fdudash-connector-windows-x64.zip; ln -sfn /srv/fdudash/releases/$GITHUB_SHA /srv/fdudash/releases/current-next; mv -Tf /srv/fdudash/releases/current-next /srv/fdudash/releases/current" < release.tar.gz
+          ssh -i ~/.ssh/fdudash_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes "fdudash-deploy@$DEPLOY_HOST" "set -eu; umask 022; mkdir -p /srv/fdudash/releases/$GITHUB_SHA; tar -xzf - -C /srv/fdudash/releases/$GITHUB_SHA; test -f /srv/fdudash/releases/$GITHUB_SHA/deployment.json; test -f /srv/fdudash/releases/$GITHUB_SHA/downloads/fdudash-connector-windows-x64.zip; ln -sfn /srv/fdudash/releases/$GITHUB_SHA /srv/fdudash/releases/current-next; mv -Tf /srv/fdudash/releases/current-next /srv/fdudash/releases/current; sudo /usr/bin/systemctl restart fdudash-hosted.service" < release.tar.gz
           curl --fail --retry 5 --retry-all-errors --retry-delay 3 --connect-timeout 10 --max-time 30 "$SITE_ORIGIN/deployment.json" | jq -e --arg version "$GITHUB_SHA" '.version == $version'
+          curl --fail --retry 5 --retry-all-errors --connect-timeout 10 --max-time 30 "$SITE_ORIGIN/api/session" | jq -e '.hasSaved == false and (.csrf | length == 64)'

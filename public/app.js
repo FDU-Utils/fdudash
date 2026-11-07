@@ -11,6 +11,12 @@ import {layoutWeek,teachingWeek,weekRange} from './schedule.js';
 let classroomAttempted=false,roomResult=null;const moduleState=new Map();let weatherResult=null,weatherAttempted=false,linksResult=null,linksAttempted=false,timetableAttempted=false;let dashboardResult=null,dashboardAttempted=false,profile=null,loginRequested=false,greetingSeed=Date.now();let learningGeneration=0;const moduleLoads=new Map();let elearningResult=null,examResult=null,statusSource='尚未连接。登录后读取个人课表。',examStatusSource='进入页面后自动读取教务考试安排。',examsAttempted=false;
 let csrf='',authenticated=false,bundle=null,items=[],busy=false,hasSaved=false,elearningAttempted=false,activePage=['dashboard','timetable','elearning','chaoxing','exams','classrooms','weather','links'].includes(location.hash.slice(1))?location.hash.slice(1):'dashboard';
 const $=id=>document.getElementById(id),form=$('login'),status=$('status');
+if (globalThis.FDUDASH_HOSTED) {
+ form.elements.remember.checked = false;
+ form.elements.remember.closest('label').hidden = true;
+ $('storage-note').dataset.i18n = '服务器会话在退出、空闲 30 分钟或服务重启后结束。';
+ $('login-description').dataset.i18n = '服务器模式通过 HTTPS 登录，账号和校园会话仅在当前服务器会话期间保存在内存中。';
+}
 $('device-controls').href=new URL('/connect',globalThis.FDUDASH_DEVICE?.base||location.origin).href;
 function message(text){statusSource=text;status.textContent=t(text);}
 function controls(){for(const e of form.elements)e.disabled=busy||authenticated;$('semester').disabled=busy||!bundle;$('refresh').disabled=busy||!authenticated;$('account-action').textContent=t(authenticated?'退出并忘记账号':'登录');$('account-action').disabled=busy;$('connect-elearning').disabled=busy||!authenticated;$('login-panel').hidden=authenticated||!loginRequested;$('refresh-dashboard').disabled=busy||!authenticated;$('bus-holiday').disabled=busy||!authenticated;$('refresh-exams').disabled=busy||!authenticated;$('refresh-weather').disabled=busy;}

@@ -59,3 +59,12 @@ Object.assign(dictionary,{'实验室或专用空间，使用前请确认预约�
 Object.assign(dictionary,{'学习通':'Chaoxing'});
 
 Object.assign(dictionary,{'本机连接器':'Local connector'});
+
+Object.assign(dictionary,{
+ '使用本机连接器':'Use local connector',
+ '本机连接器不可用，当前使用服务器。':'The local connector is unavailable. Server access is active.',
+ '服务器模式通过 HTTPS 登录，账号和校园会话仅在当前服务器会话期间保存在内存中。':'Server mode signs in over HTTPS. Credentials and campus sessions remain in memory for the current server session.',
+ '取消':'Cancel'
+});
+
+Object.assign(dictionary,{'服务器会话在退出、空闲 30 分钟或服务重启后结束。':'Server sessions end at sign-out, after 30 minutes of inactivity, or when the service restarts.'});

@@ -79,3 +79,6 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 .device-required>.layout{display:none}.device-connect{max-width:620px;margin:7vh auto;padding:30px}.device-connect form{display:flex;gap:12px;align-items:end;margin:24px 0;flex-wrap:wrap}.device-connect label{flex:1;min-width:180px}.device-connect input{display:block;width:100%;letter-spacing:4px}.pair-code{display:block;font-size:36px;letter-spacing:6px;margin:24px 0}.device-connect p{line-height:1.8}@media(max-width:680px){.device-connect{margin:24px 12px;padding:22px}}
 
 .stop-connector{color:#a34a35;background:#fff0eb}.stop-connector:hover{background:#ffe3d9}#device-controls{display:inline-block;margin:10px 0}
+
+#device-controls[hidden], #login .remember[hidden]{display:none}
+#device-connect::backdrop{background:#14233980}
