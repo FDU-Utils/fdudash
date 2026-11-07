@@ -73,3 +73,12 @@ test('Chaoxing API broker remains scoped to HTTPS SSO',()=>{
   if(url!==broker)assert.throws(()=>safeUrl(url,true),{code:'UNSAFE_REDIRECT'});
  }
 });
+
+test('Chaoxing denial redirect stops before the self-redirecting error page',async()=>{
+ const original=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>{calls++;return Response.redirect('https://passport2-api.chaoxing.com/views/error/passport403.html');};
+ try{
+  await assert.rejects(new FudanClient({allowChaoxing:true}).response('https://passport2.chaoxing.com/v2/loginfanya'),e=>e.code==='CHAOXING_ACCESS_DENIED');
+  assert.equal(calls,1);
+ }finally{globalThis.fetch=original;}
+});
