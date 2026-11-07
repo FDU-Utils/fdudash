@@ -33,3 +33,34 @@ test('eLearning verifies authenticated API and handles login redirects',async()=
 });
 
 test('service SSO connects with an existing ticket without password authentication',async()=>{const client=new FudanClient(),calls=[];client.request=async input=>{calls.push(String(input));return calls.length===1?{url:'https://id.fudan.edu.cn/login',text:'<form id="logon" action="https://ecard.fudan.edu.cn/login"><input id="ticket" value="synthetic-ticket"></form>'}:{url:'https://ecard.fudan.edu.cn/epay',text:''};};await client.connectService('https://ecard.fudan.edu.cn/epay');assert.equal(calls.length,2);assert.ok(calls[1].startsWith('https://ecard.fudan.edu.cn/login?ticket='));assert.ok(calls.every(url=>!url.includes('authExecute')));});
+
+
+test('Chaoxing OAuth follows the official broker without forwarding UIS credentials', async () => {
+ const sso='https://fysso.chaoxing.com/oauthsso/fudan';
+ const broker='https://passport2.chaoxing.com/sso';
+ const portal='https://fudan.mooc.chaoxing.com/portal';
+ const {publicKey}=generateKeyPairSync('rsa',{modulusLength:2048});
+ const key=publicKey.export({type:'spki',format:'pem'}).toString().replace(/-----[^\n]+-----|\s/g,'');
+ const original=globalThis.fetch;
+ globalThis.fetch=async(input,opts)=>{
+  const url=String(input);
+  const host=new URL(url).hostname;
+  if(host!=='id.fudan.edu.cn')assert.equal(opts.body,undefined);
+  if(url===sso)return Response.redirect('https://id.fudan.edu.cn/ac/#/index?lck=test&entityId=test');
+  if(url.includes('/ac/#'))return new Response('UIS');
+  if(url.endsWith('queryAuthMethods'))return Response.json({data:[{moduleCode:'userAndPwd',authChainCode:'chain'}]});
+  if(url.endsWith('getJsPublicKey'))return Response.json({data:key});
+  if(url.endsWith('authExecute'))return Response.json({loginToken:'test-token'});
+  if(url.endsWith('authnEngine'))return new Response('<form action="'+sso+'"><input type="hidden" name="code" value="test-code"><input type="hidden" name="state" value="test-state"><input type="hidden" name="password" value="must-not-send"></form>');
+  if(url===sso+'?code=test-code&state=test-state')return Response.redirect(broker);
+  if(url===broker)return new Response(null,{status:302,headers:{location:portal,'set-cookie':'cx-test=yes; Domain=chaoxing.com; Secure; Path=/'}});
+  if(url===portal){assert.match(opts.headers.Cookie,/cx-test=yes/);return new Response('portal');}
+  assert.fail('Unexpected request');
+ };
+ try{
+  assert.throws(()=>safeUrl(broker),{code:'UNSAFE_REDIRECT'});
+  const client=new FudanClient({allowChaoxing:true});
+  const result=await client.login('123456','synthetic-only',sso);
+  assert.equal(result.url,portal);
+ }finally{globalThis.fetch=original;}
+});
