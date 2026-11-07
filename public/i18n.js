@@ -57,3 +57,5 @@ Object.assign(dictionary,{'课表未提供':'Schedule unavailable','心理学实
 Object.assign(dictionary,{'实验室或专用空间，使用前请确认预约条件。':'Laboratory or dedicated space: confirm reservation requirements before use.'});
 
 Object.assign(dictionary,{'学习通':'Chaoxing'});
+
+Object.assign(dictionary,{'本机连接器':'Local connector'});

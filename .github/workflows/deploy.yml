@@ -45,6 +45,8 @@ jobs:
       - if: runner.os == 'Windows'
         run: node scripts/build-connector.mjs
       - if: runner.os == 'Windows'
+        run: node scripts/check-connector-package.mjs
+      - if: runner.os == 'Windows'
         shell: pwsh
         run: Compress-Archive -Path dist/connector/* -DestinationPath dist/fdudash-connector-windows-x64.zip
       - if: runner.os == 'Windows'

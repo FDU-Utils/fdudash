@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.mjs",
     "test": "node --test",
-    "test:ui": "node scripts/check-ui.mjs && node scripts/check-staged-ui.mjs && node scripts/check-live-cards.mjs && node scripts/check-chaoxing-ui.mjs && node scripts/check-cloud-ui.mjs",
+    "test:ui": "node scripts/check-ui.mjs && node scripts/check-staged-ui.mjs && node scripts/check-live-cards.mjs && node scripts/check-chaoxing-ui.mjs && node scripts/check-cloud-ui.mjs && node scripts/check-connector-ui.mjs",
     "check:public": "node scripts/check-public.mjs",
     "generate:traditional": "node scripts/generate-traditional.mjs",
     "build:web": "node scripts/build-web.mjs",
