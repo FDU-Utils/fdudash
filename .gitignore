@@ -28,3 +28,6 @@ profile*.json
 
 /dist/
 /connector-config.json
+
+/desktop/bin/
+/desktop/obj/

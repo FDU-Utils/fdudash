@@ -107,3 +107,11 @@ The hosted site defaults to HTTPS server access. Campus login credentials and up
 Enable **Use local connector** in Settings to route requests to the device. Download and extract the Windows connector, run Start.cmd, and enter the pairing code when prompted. Disable the setting to switch back to server access. The local control page and Stop.cmd manage the connector process separately. Local saved accounts remain encrypted with Windows DPAPI.
 
 GitHub Actions builds the website, Linux backend and portable Windows connector. Nginx serves the website and proxies /api/ to the backend bound to loopback. The backend runs under an unprivileged systemd service and the deployment account can restart that service.
+
+## Windows desktop preview
+
+The Windows desktop app shares this repository's frontend and local service. Download the `FDUDash-windows-x64` artifact from the **Windows desktop** GitHub Actions workflow, extract the ZIP completely, and launch `FDUDash.exe`. No WSL, Node installation, pairing code or separately started connector is required. Closing the window terminates its backend process tree.
+
+The native .NET Framework 4.8 shell uses the shared Microsoft WebView2 Evergreen Runtime to avoid bundling a browser. Windows 10 22H2 / Windows 11 x64 are targeted. If WebView2 is absent, use Microsoft's official installer linked in the package README. The unsigned portable preview requires no administrator privileges and does not install startup tasks. Existing local campus/Chaoxing login flows are reused; this does not change the cloud service's access restrictions.
+
+GitHub Actions builds the shell, bundles Node and production dependencies, runs backend/UI tests, launches the actual desktop window for a render smoke test, checks backend cleanup, and publishes the ZIP with SHA-256 checksums. Desktop source is in `desktop/`; `scripts/build-desktop.mjs` packages it. Saved credentials remain protected with Windows DPAPI. Removing the application folder does not erase the per-user saved-account store; use the in-app forget-account action first if desired.

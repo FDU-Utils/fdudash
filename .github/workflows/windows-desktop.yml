@@ -1,0 +1,52 @@
+name: Windows desktop
+on:
+  push:
+    branches: [main]
+    paths: ['desktop/**', 'scripts/build-desktop.mjs', 'server.mjs', 'lib/**', 'public/**', 'test/**', 'package*.json', '.github/workflows/windows-desktop.yml']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check:public
+      - run: npm test
+      - run: npx playwright install chromium
+      - run: npm run test:ui
+      - run: npm prune --omit=dev
+      - run: node scripts/build-desktop.mjs
+      - name: Launch actual desktop window and verify rendered app
+        shell: pwsh
+        run: |
+          $app = Start-Process -FilePath "$PWD/dist/desktop/FDUDash.exe" -ArgumentList '--smoke-test' -WindowStyle Hidden -PassThru
+          if (-not $app.WaitForExit(90000)) { $app.Kill(); throw 'Desktop startup timed out' }
+          if ($app.ExitCode -ne 0) { throw "Desktop smoke test failed: $($app.ExitCode)" }
+          $orphans = Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.ExecutablePath -like '*dist*desktop*backend*runtime*node.exe' }
+          if ($orphans) { throw 'Desktop left its backend running' }
+      - name: Package portable app
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/desktop/* -DestinationPath dist/FDUDash-windows-x64.zip
+          $hash = (Get-FileHash dist/FDUDash-windows-x64.zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  FDUDash-windows-x64.zip" | Set-Content dist/SHA256SUMS -Encoding ascii
+          $size = [math]::Round((Get-Item dist/FDUDash-windows-x64.zip).Length / 1MB, 2)
+          "Windows x64 portable ZIP: $size MiB" >> $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: FDUDash-windows-x64
+          path: |
+            dist/FDUDash-windows-x64.zip
+            dist/SHA256SUMS
+          if-no-files-found: error
