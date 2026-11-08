@@ -70,3 +70,8 @@ Object.assign(dictionary,{
 });
 
 Object.assign(dictionary,{'服务器会话在退出、空闲 30 分钟或服务重启后结束。':'Server sessions end at sign-out, after 30 minutes of inactivity, or when the service restarts.'});
+
+Object.assign(dictionary,{
+ '无法连接教室服务，WebVPN 查询也未成功。请在校网下使用桌面版或本机连接器重试。':'The classroom service could not be reached, including through WebVPN. Try the desktop app or local connector while on the campus network.',
+ '无法直连校内教室服务。请登录 UIS 以启用 WebVPN 查询，或在校网下使用桌面版或本机连接器。':'The classroom service is not directly reachable. Sign in to UIS to enable WebVPN, or use the desktop app or local connector on the campus network.'
+});
