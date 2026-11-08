@@ -83,9 +83,9 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 #device-controls[hidden], #login .remember[hidden]{display:none}
 #device-connect::backdrop{background:#14233980}
 /* Forecast tiles adapt to the widget's width, including beside the task list. */
-.dashboard-top-row > .home-weather-card{height:auto;max-height:none;overflow:visible}
+@media(max-width:900px){.dashboard-top-row > .home-weather-card{height:auto;max-height:none;overflow:visible}}
 .weather-summary-grid,.dashboard-grid .weather-summary-grid{
-  grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));
   gap:10px;
 }
 .weather-summary-grid .weather-campus{
