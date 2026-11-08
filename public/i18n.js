@@ -58,6 +58,8 @@ Object.assign(dictionary,{'实验室或专用空间，使用前请确认预约�
 
 Object.assign(dictionary,{'学习通':'Chaoxing'});
 
+Object.assign(dictionary,{'今天':'Today','明天':'Tomorrow'});
+
 Object.assign(dictionary,{'本机连接器':'Local connector'});
 
 Object.assign(dictionary,{
