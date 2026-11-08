@@ -83,7 +83,12 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 #device-controls[hidden], #login .remember[hidden]{display:none}
 #device-connect::backdrop{background:#14233980}
 /* Forecast tiles adapt to the widget's width, including beside the task list. */
-@media(max-width:900px){.dashboard-top-row > .home-weather-card{height:auto;max-height:none;overflow:visible}}
+.dashboard-top-row > .home-weather-card{height:auto;max-height:none;overflow:visible}
+@media(min-width:901px){
+  .dashboard-top-row{min-height:470px}
+  .dashboard-top-row > .todo-card{height:auto;max-height:none;overflow:visible}
+  .todo-card #todo-list{max-height:380px}
+}
 .weather-summary-grid,.dashboard-grid .weather-summary-grid{
   grid-template-columns:minmax(0,1fr);
   gap:10px;
