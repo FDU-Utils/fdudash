@@ -85,7 +85,7 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 /* Forecast tiles adapt to the widget's width, including beside the task list. */
 @media(max-width:900px){.dashboard-top-row > .home-weather-card{height:auto;max-height:none;overflow:visible}}
 .weather-summary-grid,.dashboard-grid .weather-summary-grid{
-  grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));
+  grid-template-columns:minmax(0,1fr);
   gap:10px;
 }
 .weather-summary-grid .weather-campus{
@@ -116,3 +116,8 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 .weather-full-grid .weather-day{padding:10px 0;border-top:1px solid #e8eef5}
 .weather-full-grid .weather-summary-line{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;column-gap:10px}
 .weather-full-grid .weather-icon{grid-row:span 2}
+
+#home-weather{container-type:inline-size}
+@container (min-width:380px){
+  .weather-summary-grid,.dashboard-grid .weather-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

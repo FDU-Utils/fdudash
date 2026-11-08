@@ -26,7 +26,7 @@ sealed class MainWindow:Form {
  readonly Label loading=new Label{Text="正在启动 FDUDash…",Dock=DockStyle.Fill,TextAlign=ContentAlignment.MiddleCenter};
  readonly bool smoke; Process backend; IntPtr job; string origin; bool closing;
  public int Result=1;
- public MainWindow(bool smoke){this.smoke=smoke;Text="FDUDash";Width=1200;Height=820;MinimumSize=new Size(800,600);StartPosition=FormStartPosition.CenterScreen;Controls.Add(loading);Shown+=async(s,e)=>await Start();FormClosed+=(s,e)=>Stop();}
+ public MainWindow(bool smoke){this.smoke=smoke;Text="FDUDash";Icon=System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);Width=1200;Height=820;MinimumSize=new Size(800,600);StartPosition=FormStartPosition.CenterScreen;Controls.Add(loading);Shown+=async(s,e)=>await Start();FormClosed+=(s,e)=>Stop();}
  async Task Start(){try{
   CoreWebView2Environment.GetAvailableBrowserVersionString();
   int port=5187;
