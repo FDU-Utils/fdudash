@@ -37,3 +37,4 @@ Object.assign(latin,{'部分楼宇读取失败，结果可能不完整。':'Nonn
 Object.assign(latin,{'课表未提供':'Tabula non data','心理学实验室':'Laboratorium psychologiae','新媒体中心':'Centrum novorum mediorum','现代物理研究所':'Institutum physicae modernae','相辉堂':'Aula Xianghui'});
 
 Object.assign(latin,{'实验室或专用空间，使用前请确认预约条件。':'Laboratorium vel spatium proprium: condiciones reservationis ante usum verifica.'});
+Object.assign(latin,{'刷新页面':'Paginam renova'});
