@@ -27,6 +27,7 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 .dashboard-grid>.card,.dashboard-grid .dashboard-metrics .card{margin:0;min-width:0}
 .dashboard-grid .dashboard-metrics{grid-template-columns:minmax(0,1fr);gap:20px;min-width:0}
 .dashboard-grid .weather-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .weather-summary-grid .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr))}
 .bus-workspace{display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;margin-top:22px}
 .bus-route-sidebar{border-right:1px solid #e5edf5;padding-right:20px;min-width:0}
 .bus-route-group+ .bus-route-group{margin-top:22px}
@@ -117,10 +118,11 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 #home-weather,.weather-full-grid .weather-campus{container-type:inline-size}
 .weather-periods{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
 @container (min-width:380px){
-  .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .weather-full-grid .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 .weather-full-grid .weather-day{min-width:0;overflow-wrap:anywhere}
 
 @container (min-width:640px){
   .dashboard-grid .weather-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .weather-summary-grid .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
