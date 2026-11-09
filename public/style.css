@@ -93,12 +93,6 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
   grid-template-columns:minmax(0,1fr);
   gap:10px;
 }
-.weather-summary-grid .weather-campus{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-}
-.weather-summary-grid .weather-campus h3{grid-column:1/-1}
 .weather-summary-grid .weather-day{
   min-width:0;
   padding:8px 4px;
@@ -116,21 +110,13 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 .weather-icon[data-weather=storm]{color:#7774bb}
 .weather-summary-line .weather-condition{margin:0;color:#536b81;overflow-wrap:anywhere}
 .weather-summary-line .weather-range{margin:0;font-size:14px;overflow-wrap:anywhere}
-.weather-summary-grid .weather-next-period{border-color:#d9e8f5;background:#eef6ff}
-.weather-next-period .weather-day-label{color:#285d8b}
 .weather-full-grid .weather-day{padding:10px 0;border-top:1px solid #e8eef5}
 .weather-full-grid .weather-summary-line{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;column-gap:10px}
 .weather-full-grid .weather-icon{grid-row:span 2}
 
-#home-weather{container-type:inline-size}
+#home-weather,.weather-full-grid .weather-campus{container-type:inline-size}
+.weather-periods{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
 @container (min-width:380px){
-  .weather-summary-grid,.dashboard-grid .weather-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-
-.weather-periods{display:grid;gap:8px}
-.weather-summary-grid .weather-periods{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
-.weather-summary-grid .weather-next-period{background:transparent;border-color:#e8eef5}
-.weather-summary-grid .weather-next-period .weather-icon{width:26px;height:26px}
-.weather-summary-grid .weather-next-period .weather-range{font-weight:600}
-.weather-full-grid .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .weather-full-grid .weather-day{min-width:0;overflow-wrap:anywhere}
