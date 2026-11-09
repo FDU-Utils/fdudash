@@ -126,3 +126,11 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
 @container (min-width:380px){
   .weather-summary-grid,.dashboard-grid .weather-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+.weather-periods{display:grid;gap:8px}
+.weather-summary-grid .weather-periods{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+.weather-summary-grid .weather-next-period{background:transparent;border-color:#e8eef5}
+.weather-summary-grid .weather-next-period .weather-icon{width:26px;height:26px}
+.weather-summary-grid .weather-next-period .weather-range{font-weight:600}
+.weather-full-grid .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.weather-full-grid .weather-day{min-width:0;overflow-wrap:anywhere}
