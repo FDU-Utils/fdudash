@@ -120,3 +120,7 @@ nav .nav{display:block;text-decoration:none;cursor:pointer;color:#58718c}.accoun
   .weather-periods{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 .weather-full-grid .weather-day{min-width:0;overflow-wrap:anywhere}
+
+@container (min-width:640px){
+  .dashboard-grid .weather-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
