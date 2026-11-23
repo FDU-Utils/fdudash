@@ -5,7 +5,7 @@ const root=new URL('../',import.meta.url),out=new URL('../dist/FDUDash.app/Conte
 await mkdir(new URL('MacOS/',out),{recursive:true});
 await mkdir(new URL('Resources/backend/runtime/',out),{recursive:true});
 for(const [source,target] of [['App','FDUDash'],['Vault','vault']]){
- execFileSync('swiftc',['desktop/macos/'+source+'.swift','-parse-as-library',...(source==='Vault'?[]:[]),'-o',new URL('MacOS/'+target,out).pathname],{cwd:root,stdio:'inherit'});
+ execFileSync('swiftc',['desktop/macos/'+source+'.swift','-parse-as-library','-target',(process.arch==='arm64'?'arm64':'x86_64')+'-apple-macosx13.0','-o',new URL('MacOS/'+target,out).pathname],{cwd:root,stdio:'inherit'});
 }
 const backend=new URL('Resources/backend/',out);
 for(const name of ['server.mjs','lib','public','licenses','LICENSE','package.json','package-lock.json','node_modules'])await cp(new URL(name,root),new URL(name,backend),{recursive:true});
