@@ -12,7 +12,7 @@ import {randomBytes,timingSafeEqual} from 'node:crypto';
 import {FudanClient,CampusError} from './lib/fudan.mjs';
 import {vault,profileCache} from './lib/vault.mjs';
 import {restoreProfile,dashboardData,readCampus,elearningBundle,withService,sessionExams} from './lib/dashboard.mjs';
-const port=Number(process.env.PORT||5173),origin=`http://127.0.0.1:${port}`;
+let port=Number(process.env.PORT||5173),origin=`http://127.0.0.1:${port}`;
 const hosted = process.env.FDUDASH_HOSTED === '1';
 const desktop = process.env.FDUDASH_DESKTOP === '1';
 const webOrigins = hosted ? parseWebOrigins(process.env.FDUDASH_WEB_ORIGIN) : [origin];
@@ -92,4 +92,4 @@ const server=http.createServer(async(req,res)=>{
  respond(res,404,{message:'接口不存在。'});
  }finally{release();}
  }catch(error){if(error.code==='EXPIRED'){/* UI asks the user to authenticate again. */}respond(res,error instanceof CampusError?400:500,{code:error instanceof CampusError?error.code:'INTERNAL',message:error instanceof CampusError?error.message:'本机服务处理失败，未记录认证信息。'});}
-}).listen(port,'127.0.0.1',()=>console.log(`fdudash: ${origin} (local only; local encrypted credential storage)`));
+}).listen(port,'127.0.0.1',()=>{port=server.address().port;origin=new URL(origin).protocol+'//127.0.0.1:'+port;if(!hosted)webOrigins[0]=origin;console.log(`fdudash: ${'http://127.0.0.1:'+port} (local only; local encrypted credential storage)`);});
