@@ -27,9 +27,12 @@ jobs:
         run: |
           set -euo pipefail
           helper="$PWD/dist/FDUDash.app/Contents/MacOS/vault"
+          echo "Keychain encryption"
           encrypted=$(printf 'c3ludGhldGljLW9ubHk=' | "$helper")
+          echo "Keychain decryption"
           decrypted=$(printf '%s' "$encrypted" | "$helper" --decrypt)
           test "$decrypted" = c3ludGhldGljLW9ubHk=
+          echo "Launching desktop"
           dist/FDUDash.app/Contents/MacOS/FDUDash &
           app_pid=$!
           trap 'kill "$app_pid" 2>/dev/null || true' EXIT
@@ -37,13 +40,13 @@ jobs:
           for i in {1..30}; do
             node_pid=$(pgrep -P "$app_pid" node || true)
             if [ -n "$node_pid" ]; then
-              port=$(lsof -a -p "$node_pid" -iTCP -sTCP:LISTEN -Fn | sed -n 's/^n127.0.0.1://p')
+              port=$(lsof -a -p "$node_pid" -iTCP -sTCP:LISTEN -Fn | sed -n 's/^n127.0.0.1://p' || true)
               if [ -n "$port" ]; then break; fi
             fi
             sleep 1
           done
           test -n "$node_pid"
-          curl --fail --retry 3 "http://127.0.0.1:$port/api/session" | grep csrf
+          curl --fail --retry 3 "http://127.0.0.1:$port/api/session" | grep -q csrf
           osascript -e 'tell application "FDUDash" to quit'
           sleep 2
           if kill -0 "$node_pid" 2>/dev/null; then echo 'Backend still running'; exit 1; fi

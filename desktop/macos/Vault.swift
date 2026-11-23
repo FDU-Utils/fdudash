@@ -18,9 +18,10 @@ do {
   var add = query
   add[kSecValueData as String] = random
   add[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-  guard SecItemAdd(add as CFDictionary,nil) == errSecSuccess else { exit(1) }
+  let added=SecItemAdd(add as CFDictionary,nil)
+  guard added == errSecSuccess else { fputs("Keychain add status: \(added)\n",stderr);exit(1) }
   bytes = random
- } else { exit(1) }
+ } else { fputs("Keychain lookup status: \(status)\n",stderr);exit(1) }
  let raw = FileHandle.standardInput.readDataToEndOfFile()
  guard let input = Data(base64Encoded:raw) else { exit(1) }
  let key = SymmetricKey(data:bytes)
