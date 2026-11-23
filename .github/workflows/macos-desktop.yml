@@ -40,12 +40,13 @@ jobs:
           for i in {1..30}; do
             node_pid=$(pgrep -P "$app_pid" node || true)
             if [ -n "$node_pid" ]; then
-              port=$(lsof -a -p "$node_pid" -iTCP -sTCP:LISTEN -Fn | sed -n 's/^n127.0.0.1://p' || true)
+              port=$(lsof -nP -a -p "$node_pid" -iTCP -sTCP:LISTEN -Fn | sed -n 's/^n127.0.0.1://p' || true)
               if [ -n "$port" ]; then break; fi
             fi
             sleep 1
           done
           test -n "$node_pid"
+          test -n "$port"
           curl --fail --retry 3 "http://127.0.0.1:$port/api/session" | grep -q csrf
           osascript -e 'tell application "FDUDash" to quit'
           sleep 2
