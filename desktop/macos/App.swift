@@ -20,6 +20,13 @@ final class App: NSObject, NSApplicationDelegate, WKNavigationDelegate {
   submenu.addItem(withTitle: "Quit FDUDash", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
   item.submenu = submenu
   menu.addItem(item)
+  let editItem = NSMenuItem()
+  let editMenu = NSMenu(title: "Edit")
+  for (title, action, key) in [("Cut", "cut:", "x"), ("Copy", "copy:", "c"), ("Paste", "paste:", "v"), ("Select All", "selectAll:", "a")] {
+   editMenu.addItem(withTitle: title, action: NSSelectorFromString(action), keyEquivalent: key)
+  }
+  editItem.submenu = editMenu
+  menu.addItem(editItem)
   NSApp.mainMenu = menu
   window = NSWindow(contentRect: NSRect(x: 0,y: 0,width: 1200,height: 850),styleMask: [.titled,.closable,.miniaturizable,.resizable],backing: .buffered,defer: false)
   window.title = "FDUDash"
@@ -53,6 +60,13 @@ final class App: NSObject, NSApplicationDelegate, WKNavigationDelegate {
    }
    let address = String(text[range])
    DispatchQueue.main.async { self.origin = address; web.load(URLRequest(url: URL(string: address)!)) }
+  }
+ }
+ func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+  webView.evaluateJavaScript("document.querySelector('#nav-dashboard') !== null") { result, error in
+   if result as? Bool == true {
+    FileHandle.standardOutput.write(Data("FDUDash interface ready\n".utf8))
+   }
   }
  }
  func fail(_ message: String) {

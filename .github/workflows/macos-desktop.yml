@@ -33,7 +33,7 @@ jobs:
           decrypted=$(printf '%s' "$encrypted" | "$helper" --decrypt)
           test "$decrypted" = c3ludGhldGljLW9ubHk=
           echo "Launching desktop"
-          dist/FDUDash.app/Contents/MacOS/FDUDash &
+          dist/FDUDash.app/Contents/MacOS/FDUDash > /tmp/fdudash-ui.log &
           app_pid=$!
           trap 'kill "$app_pid" 2>/dev/null || true' EXIT
           node_pid=""
@@ -48,6 +48,11 @@ jobs:
           test -n "$node_pid"
           test -n "$port"
           curl --fail --retry 3 "http://127.0.0.1:$port/api/session" | grep -q csrf
+          for i in {1..30}; do
+            if grep -q 'FDUDash interface ready' /tmp/fdudash-ui.log; then break; fi
+            sleep 1
+          done
+          grep -q 'FDUDash interface ready' /tmp/fdudash-ui.log
           osascript -e 'tell application "FDUDash" to quit'
           sleep 2
           if kill -0 "$node_pid" 2>/dev/null; then echo 'Backend still running'; exit 1; fi
