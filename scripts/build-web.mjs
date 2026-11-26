@@ -2,7 +2,7 @@ import {cp,mkdir,readFile,writeFile} from 'node:fs/promises';import {fileURLToPa
 const root=new URL('../',import.meta.url),out=new URL('../dist/web/',import.meta.url),origin=process.env.WEB_ORIGIN;
 if(!origin||new URL(origin).protocol!=='https:'||new URL(origin).origin!==origin)throw Error('WEB_ORIGIN must be an exact HTTPS origin');
 if(process.env.GITHUB_ACTIONS!=='true')throw Error('Release builds run in GitHub Actions');
-await mkdir(out,{recursive:true});await cp(new URL('public/',root),out,{recursive:true,filter:src=>!['connect.html','bridge-ui.js'].includes(src.split(/[\\/]/).pop())});let html=await readFile(new URL('index.html',out),'utf8');html=html.replace('src="/app.js"','src="/bootstrap.js"');if(new URL(origin).hostname==='fdudash.aminiam.com'){
+await mkdir(out,{recursive:true});await cp(new URL('public/',root),out,{recursive:true,filter:src=>!['connect.html','bridge-ui.js'].includes(src.split(/[\\/]/).pop())});let html=await readFile(new URL('index.html',out),'utf8');html=html.replace('src="/app.js"','src="/bootstrap.js"');if(['fdudash.aminiam.com','47.116.178.249'].includes(new URL(origin).hostname)){
  const footer='<footer class="site-registration" data-preserve-text><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">苏ICP备2026089130号-1</a><a href="https://beian.mps.gov.cn/#/query/webSearch?code=31010902101712" target="_blank" rel="noopener noreferrer">沪公网安备31010902101712号</a></footer>';
  if(!html.includes('</main>'))throw Error('Website footer insertion point missing');
  html=html.replace('</main>',footer+'</main>');
